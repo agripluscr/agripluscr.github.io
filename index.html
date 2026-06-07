@@ -1,0 +1,1698 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AgriPlusCR — Agricultura & Comercio</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<style>
+:root {
+  --green-dark: #1a3a2a;
+  --green-mid: #2d6a4f;
+  --green-light: #52b788;
+  --green-pale: #d8f3dc;
+  --amber: #f4a261;
+  --amber-light: #fef3e2;
+  --cream: #fdfaf5;
+  --charcoal: #1c1c1e;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --shadow: 0 2px 16px rgba(45,106,79,0.10);
+  --shadow-lg: 0 8px 40px rgba(45,106,79,0.15);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--cream);
+  color: var(--charcoal);
+  scroll-behavior: smooth;
+}
+
+/* ── NAVBAR ── */
+.navbar {
+  background: rgba(255,255,255,0.97) !important;
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0.75rem 0;
+  position: sticky; top: 0; z-index: 1000;
+  box-shadow: 0 1px 8px rgba(0,0,0,0.06);
+}
+.navbar-brand {
+  font-family: 'Playfair Display', serif;
+  font-weight: 800;
+  font-size: 1.4rem;
+  color: var(--green-dark) !important;
+  display: flex; align-items: center; gap: 10px;
+}
+.brand-logo-svg {
+  width: 42px; height: 42px;
+  flex-shrink: 0;
+}
+.nav-link {
+  color: var(--charcoal) !important;
+  font-weight: 500;
+  font-size: 0.9rem;
+  padding: 0.4rem 1rem !important;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+.nav-link:hover { background: var(--green-pale); color: var(--green-mid) !important; }
+.btn-cart {
+  background: var(--green-mid);
+  color: white !important;
+  border-radius: 20px;
+  padding: 0.4rem 1.1rem !important;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+  border: none;
+}
+.btn-cart:hover { background: var(--green-dark); transform: translateY(-1px); }
+.cart-badge {
+  background: var(--amber);
+  color: white;
+  border-radius: 50%;
+  width: 18px; height: 18px;
+  font-size: 10px;
+  display: inline-flex; align-items: center; justify-content: center;
+  position: relative; top: -8px; left: -6px;
+}
+
+/* ── HERO ── */
+.hero {
+  background: linear-gradient(135deg, var(--green-dark) 0%, var(--green-mid) 60%, #74c69d 100%);
+  min-height: 88vh;
+  display: flex; align-items: center;
+  position: relative; overflow: hidden;
+  padding: 5rem 0 4rem;
+}
+.hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Ccircle cx='30' cy='30' r='10'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+.hero-tag {
+  display: inline-block;
+  background: rgba(255,255,255,0.15);
+  color: #b7e4c7;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.2);
+  margin-bottom: 1.5rem;
+}
+.hero h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2.4rem, 5vw, 4rem);
+  font-weight: 800;
+  color: white;
+  line-height: 1.12;
+  margin-bottom: 1.5rem;
+}
+.hero h1 span { color: #95d5b2; }
+.hero p {
+  color: rgba(255,255,255,0.8);
+  font-size: 1.1rem;
+  font-weight: 300;
+  line-height: 1.7;
+  max-width: 480px;
+  margin-bottom: 2.5rem;
+}
+.btn-hero-primary {
+  background: white;
+  color: var(--green-dark);
+  font-weight: 600;
+  padding: 0.85rem 2rem;
+  border-radius: 50px;
+  border: none;
+  font-size: 0.95rem;
+  transition: all 0.25s;
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.btn-hero-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
+.btn-hero-secondary {
+  background: transparent;
+  color: white;
+  font-weight: 500;
+  padding: 0.85rem 2rem;
+  border-radius: 50px;
+  border: 1.5px solid rgba(255,255,255,0.5);
+  font-size: 0.95rem;
+  transition: all 0.25s;
+}
+.btn-hero-secondary:hover { background: rgba(255,255,255,0.1); border-color: white; color: white; }
+.hero-stats {
+  display: flex; gap: 2.5rem;
+  margin-top: 3rem;
+  border-top: 1px solid rgba(255,255,255,0.15);
+  padding-top: 2rem;
+}
+.hero-stat-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: white;
+  display: block;
+}
+.hero-stat-label {
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+/* Hero logo display */
+.hero-logo-display {
+  display: flex; justify-content: center; align-items: center;
+  position: relative;
+}
+.hero-logo-circle {
+  width: 340px; height: 340px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.15);
+  display: flex; align-items: center; justify-content: center;
+  backdrop-filter: blur(4px);
+}
+.hero-logo-circle svg {
+  width: 220px; height: 220px;
+  filter: drop-shadow(0 8px 32px rgba(0,0,0,0.25));
+}
+
+/* ── SECTION STYLES ── */
+.section-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--green-mid);
+  margin-bottom: 0.5rem;
+}
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.8rem, 3vw, 2.5rem);
+  font-weight: 700;
+  color: var(--charcoal);
+  line-height: 1.2;
+}
+.section-title span { color: var(--green-mid); }
+
+/* ── CATEGORY PILLS ── */
+.category-pill {
+  display: inline-block;
+  padding: 0.45rem 1.1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1.5px solid var(--border);
+  background: white;
+  color: var(--muted);
+  transition: all 0.2s;
+  user-select: none;
+}
+.category-pill:hover, .category-pill.active {
+  background: var(--green-mid);
+  border-color: var(--green-mid);
+  color: white;
+}
+
+/* ── PRODUCT CARD ── */
+.product-card {
+  background: white;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+  transition: all 0.3s;
+  height: 100%;
+  display: flex; flex-direction: column;
+}
+.product-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); border-color: transparent; }
+.product-img {
+  height: 160px;
+  background: var(--green-pale);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 4rem;
+  position: relative;
+}
+.product-badge {
+  position: absolute; top: 10px; left: 10px;
+  background: var(--green-mid);
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.product-badge.organic { background: #52b788; }
+.product-badge.promo { background: var(--amber); }
+.product-body { padding: 1.1rem 1.25rem; flex: 1; display: flex; flex-direction: column; }
+.product-name { font-weight: 600; font-size: 1rem; margin-bottom: 4px; color: var(--charcoal); }
+.product-origin { font-size: 0.78rem; color: var(--muted); margin-bottom: 0.75rem; }
+.product-price { font-family: 'Playfair Display', serif; font-size: 1.25rem; font-weight: 700; color: var(--green-dark); }
+.product-price small { font-family: 'DM Sans', sans-serif; font-size: 0.75rem; font-weight: 400; color: var(--muted); }
+.product-footer { padding: 0 1.25rem 1.1rem; }
+.btn-add {
+  width: 100%;
+  background: var(--green-pale);
+  color: var(--green-dark);
+  font-weight: 600;
+  font-size: 0.88rem;
+  border: none;
+  border-radius: 12px;
+  padding: 0.6rem;
+  transition: all 0.2s;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.btn-add:hover { background: var(--green-mid); color: white; }
+
+/* ── FARMER PANEL ── */
+.farmer-panel {
+  background: var(--green-dark);
+  border-radius: 28px;
+  padding: 2.5rem;
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+.farmer-panel::before {
+  content: '';
+  position: absolute;
+  width: 300px; height: 300px;
+  background: rgba(255,255,255,0.03);
+  border-radius: 50%;
+  top: -100px; right: -80px;
+}
+.panel-action-card {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 16px;
+  padding: 1.25rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: white;
+  text-decoration: none;
+  display: block;
+}
+.panel-action-card:hover { background: rgba(255,255,255,0.15); transform: translateY(-3px); color: white; }
+.panel-action-icon {
+  width: 48px; height: 48px;
+  background: rgba(255,255,255,0.12);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.3rem;
+  margin: 0 auto 0.75rem;
+}
+
+/* ── REGISTER ── */
+.register-card {
+  background: white;
+  border-radius: 24px;
+  border: 1px solid var(--border);
+  padding: 2.5rem;
+  box-shadow: var(--shadow);
+}
+.form-control, .form-select {
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 0.7rem 1rem;
+  font-size: 0.9rem;
+  font-family: 'DM Sans', sans-serif;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.form-control:focus, .form-select:focus {
+  border-color: var(--green-light);
+  box-shadow: 0 0 0 3px rgba(82,183,136,0.15);
+}
+.form-label { font-size: 0.85rem; font-weight: 600; color: var(--charcoal); margin-bottom: 6px; }
+.btn-register {
+  background: var(--green-mid);
+  color: white;
+  font-weight: 600;
+  padding: 0.8rem;
+  border-radius: 12px;
+  border: none;
+  font-size: 0.95rem;
+  width: 100%;
+  transition: all 0.2s;
+}
+.btn-register:hover { background: var(--green-dark); transform: translateY(-1px); }
+
+/* ── FOOTER ── */
+footer {
+  background: var(--green-dark);
+  color: rgba(255,255,255,0.75);
+  padding: 3rem 0 1.5rem;
+}
+footer h5 {
+  font-family: 'Playfair Display', serif;
+  color: white;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+footer a { color: rgba(255,255,255,0.6); text-decoration: none; font-size: 0.88rem; display: block; margin-bottom: 6px; transition: color 0.2s; }
+footer a:hover { color: var(--green-light); }
+.footer-bottom { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem; margin-top: 2rem; font-size: 0.83rem; }
+
+/* ── ADMIN ── */
+#adminPanel {
+  display: none;
+  background: white;
+  border-radius: 24px;
+  border: 1px solid var(--border);
+  padding: 2rem;
+  box-shadow: var(--shadow);
+  margin-top: 2rem;
+}
+.admin-table { font-size: 0.88rem; }
+.admin-table th { font-weight: 600; color: var(--muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 2px solid var(--border); }
+.admin-table td { vertical-align: middle; padding: 0.75rem 0.5rem; border-color: var(--border); }
+.btn-sm-green { background: var(--green-pale); color: var(--green-dark); border: none; border-radius: 8px; font-size: 0.78rem; font-weight: 600; padding: 4px 12px; }
+.btn-sm-green:hover { background: var(--green-mid); color: white; }
+.btn-sm-red { background: #fee2e2; color: #991b1b; border: none; border-radius: 8px; font-size: 0.78rem; font-weight: 600; padding: 4px 12px; }
+.btn-sm-red:hover { background: #ef4444; color: white; }
+
+/* ── TOAST / ALERT ── */
+.toast-custom {
+  position: fixed; bottom: 24px; right: 24px;
+  background: var(--green-dark);
+  color: white;
+  padding: 0.85rem 1.5rem;
+  border-radius: 14px;
+  font-size: 0.88rem;
+  font-weight: 500;
+  box-shadow: var(--shadow-lg);
+  z-index: 9999;
+  display: none;
+  align-items: center; gap: 8px;
+  animation: slideUp 0.3s ease;
+}
+@keyframes slideUp { from{transform:translateY(20px);opacity:0} to{transform:translateY(0);opacity:1} }
+
+/* ── MODAL ── */
+.modal-content { border-radius: 20px; border: none; }
+.modal-header { border-bottom: 1px solid var(--border); padding: 1.25rem 1.5rem; }
+.modal-title { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 1.2rem; }
+
+/* ── CART SIDEBAR ── */
+.offcanvas { --bs-offcanvas-width: 380px; }
+.cart-item { background: var(--cream); border-radius: 12px; padding: 0.85rem; margin-bottom: 0.75rem; display: flex; gap: 12px; align-items: center; }
+.cart-item-emoji { font-size: 2rem; width: 50px; text-align: center; }
+.cart-total { background: var(--green-dark); color: white; border-radius: 16px; padding: 1.25rem; margin-top: 1rem; }
+
+/* ── RESPONSIVE TWEAKS ── */
+@media(max-width:768px) {
+  .hero { min-height: auto; padding: 4rem 0 3rem; }
+  .hero-logo-display { display: none; }
+  .hero-stats { gap: 1.5rem; }
+}
+.login-toggle-btn {
+  background: none;
+  border: 1.5px solid var(--border);
+  border-radius: 20px;
+  padding: 0.35rem 1rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--muted);
+  transition: all 0.2s;
+  cursor: pointer;
+  display: flex; align-items: center; gap: 6px;
+}
+.login-toggle-btn:hover { border-color: var(--green-light); color: var(--green-mid); }
+.login-toggle-btn.logged { background: var(--green-pale); border-color: var(--green-light); color: var(--green-dark); }
+</style>
+</head>
+<body>
+
+<!-- SVG Logo Definition (reutilizable) -->
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="agriplus-logo" viewBox="0 0 100 100">
+    <!-- Círculo exterior -->
+    <circle cx="50" cy="55" r="36" fill="none" stroke="#2d6a4f" stroke-width="4.5"/>
+    <!-- Tallo central -->
+    <path d="M50 72 Q50 58 50 50" stroke="#2d6a4f" stroke-width="4" stroke-linecap="round" fill="none"/>
+    <!-- Hoja izquierda grande -->
+    <path d="M50 50 Q38 42 32 28 Q44 30 50 50Z" fill="#2d6a4f"/>
+    <!-- Hoja derecha grande -->
+    <path d="M50 50 Q62 42 68 28 Q56 30 50 50Z" fill="#2d6a4f"/>
+    <!-- Hoja central superior -->
+    <path d="M50 50 Q50 36 50 22 Q56 30 50 50Z" fill="#52b788"/>
+    <!-- Símbolo + -->
+    <line x1="50" y1="61" x2="50" y2="73" stroke="#2d6a4f" stroke-width="4" stroke-linecap="round"/>
+    <line x1="44" y1="67" x2="56" y2="67" stroke="#2d6a4f" stroke-width="4" stroke-linecap="round"/>
+  </symbol>
+</svg>
+
+<!-- ═══════════════ NAVBAR ═══════════════ -->
+<nav class="navbar navbar-expand-lg">
+  <div class="container">
+    <a class="navbar-brand" href="#inicio">
+      <svg class="brand-logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <use href="#agriplus-logo"/>
+      </svg>
+      AgriPlusCR
+    </a>
+    <button class="navbar-toggler border-0" data-bs-toggle="collapse" data-bs-target="#navContent">
+      <i class="bi bi-list fs-4"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="navContent">
+      <ul class="navbar-nav mx-auto gap-1">
+        <li class="nav-item"><a class="nav-link" href="#inicio">Inicio</a></li>
+        <li class="nav-item"><a class="nav-link" href="#productos">Productos</a></li>
+        <li class="nav-item"><a class="nav-link" href="#agricultor">Agricultor</a></li>
+        <li class="nav-item"><a class="nav-link" href="#registro">Registro</a></li>
+      </ul>
+      <div class="d-flex align-items-center gap-2">
+        <button class="login-toggle-btn" id="loginToggleBtn" onclick="toggleLoginModal()">
+          <i class="bi bi-person-circle"></i>
+          <span id="loginBtnText">Iniciar sesión</span>
+        </button>
+        <button class="login-toggle-btn" id="misPedidosBtn" style="display:none" onclick="openMisPedidos()">
+          <i class="bi bi-bag-check"></i>
+          <span>Mis pedidos</span>
+        </button>
+        <button class="btn-cart nav-link" data-bs-toggle="offcanvas" data-bs-target="#cartSidebar">
+          <i class="bi bi-bag"></i> Carrito
+          <span class="cart-badge" id="cartCount">0</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══════════════ HERO ═══════════════ -->
+<section class="hero" id="inicio">
+  <div class="container position-relative">
+    <div class="row align-items-center">
+      <div class="col-lg-6">
+        <div class="hero-tag"><i class="bi bi-patch-check me-1"></i> Plataforma #1 de Costa Rica</div>
+        <h1>Cultivamos<br><span>oportunidades</span><br>para todos</h1>
+        <p>Conecta agricultores y consumidores. Compra productos frescos directo del campo o adquiere tecnología agrícola de última generación.</p>
+        <div class="d-flex flex-wrap gap-3">
+          <a href="#productos" class="btn-hero-primary text-decoration-none">
+            <i class="bi bi-bag-heart"></i> Explorar productos
+          </a>
+          <a href="#registro" class="btn-hero-secondary text-decoration-none">Únete gratis →</a>
+        </div>
+        <div class="hero-stats">
+          <div><span class="hero-stat-num">100%</span><span class="hero-stat-label">Producto nacional</span></div>
+          <div><span class="hero-stat-num">0%</span><span class="hero-stat-label">Comisión de registro</span></div>
+          <div><span class="hero-stat-num">24/7</span><span class="hero-stat-label">Soporte en línea</span></div>
+        </div>
+      </div>
+      <div class="col-lg-6 hero-logo-display">
+        <div class="hero-logo-circle">
+          <!-- Logo blanco para el hero oscuro -->
+          <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="50" cy="55" r="36" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="4.5"/>
+            <path d="M50 72 Q50 58 50 50" stroke="rgba(255,255,255,0.9)" stroke-width="4" stroke-linecap="round" fill="none"/>
+            <path d="M50 50 Q38 42 32 28 Q44 30 50 50Z" fill="rgba(255,255,255,0.9)"/>
+            <path d="M50 50 Q62 42 68 28 Q56 30 50 50Z" fill="rgba(255,255,255,0.9)"/>
+            <path d="M50 50 Q50 36 50 22 Q56 30 50 50Z" fill="#95d5b2"/>
+            <line x1="50" y1="61" x2="50" y2="73" stroke="rgba(255,255,255,0.9)" stroke-width="4" stroke-linecap="round"/>
+            <line x1="44" y1="67" x2="56" y2="67" stroke="rgba(255,255,255,0.9)" stroke-width="4" stroke-linecap="round"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ PRODUCTS ═══════════════ -->
+<section class="py-5" id="productos" style="background:var(--cream)">
+  <div class="container">
+    <div class="row mb-4 align-items-end">
+      <div class="col">
+        <div class="section-label">Lo mejor de la cosecha</div>
+        <h2 class="section-title">Productos <span>Destacados</span></h2>
+      </div>
+      <div class="col-auto d-none d-md-block">
+        <a href="#" class="text-decoration-none" style="color:var(--green-mid);font-weight:600;font-size:.9rem">
+          Ver todos <i class="bi bi-arrow-right"></i>
+        </a>
+      </div>
+    </div>
+
+    <!-- Category Filter -->
+    <div class="d-flex flex-wrap gap-2 mb-4" id="categoryFilter">
+      <span class="category-pill active" data-cat="all">🌿 Todos</span>
+      <span class="category-pill" data-cat="verdura">🥬 Verduras</span>
+      <span class="category-pill" data-cat="fruta">🍓 Frutas</span>
+      <span class="category-pill" data-cat="tuberculo">🥔 Tubérculos</span>
+      <span class="category-pill" data-cat="grano">🌽 Granos</span>
+    </div>
+
+    <!-- Search bar -->
+    <div class="mb-4 d-flex gap-2">
+      <div class="input-group" style="max-width:300px">
+        <span class="input-group-text bg-white border-end-0" style="border-radius:12px 0 0 12px;border:1.5px solid var(--border)">
+          <i class="bi bi-search text-muted" style="font-size:.85rem"></i>
+        </span>
+        <input type="text" class="form-control border-start-0 ps-0" id="searchInput" placeholder="Buscar producto..." style="border-radius:0 12px 12px 0;border:1.5px solid var(--border);border-left:none" oninput="filterProducts()">
+      </div>
+    </div>
+
+    <div class="row g-3" id="productsGrid"></div>
+    <div id="emptyState" class="text-center py-5" style="display:none">
+      <div style="font-size:3rem;margin-bottom:1rem">🌾</div>
+      <p style="color:var(--muted);font-size:.95rem">No se encontraron productos con ese filtro.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ FARMER PANEL ═══════════════ -->
+<section class="py-5" id="agricultor" style="background:white">
+  <div class="container">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-5">
+        <div class="section-label">Para productores</div>
+        <h2 class="section-title mb-3">Panel del <span>Agricultor</span></h2>
+        <p style="color:var(--muted);line-height:1.7;font-size:.95rem">Publica tus productos, gestiona inventario, revisa estadísticas de venta y accede a tecnología agrícola de vanguardia. Todo desde un solo lugar.</p>
+        <div class="d-flex gap-3 mt-4">
+          <div style="text-align:center">
+            <div style="font-size:1.4rem;font-weight:700;color:var(--green-dark);font-family:'Playfair Display',serif">98%</div>
+            <div style="font-size:.75rem;color:var(--muted)">Satisfacción</div>
+          </div>
+          <div style="width:1px;background:var(--border)"></div>
+          <div style="text-align:center">
+            <div style="font-size:1.4rem;font-weight:700;color:var(--green-dark);font-family:'Playfair Display',serif">0%</div>
+            <div style="font-size:.75rem;color:var(--muted)">Comisión base</div>
+          </div>
+          <div style="width:1px;background:var(--border)"></div>
+          <div style="text-align:center">
+            <div style="font-size:1.4rem;font-weight:700;color:var(--green-dark);font-family:'Playfair Display',serif">24h</div>
+            <div style="font-size:.75rem;color:var(--muted)">Soporte</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-7">
+        <div class="farmer-panel">
+          <h4 style="font-family:'Playfair Display',serif;font-size:1.2rem;margin-bottom:1.5rem">Panel de herramientas</h4>
+          <div class="row g-3">
+            <div class="col-6 col-md-3">
+              <a href="#" class="panel-action-card" onclick="openAdminIfLogged(event)">
+                <div class="panel-action-icon"><i class="bi bi-plus-circle"></i></div>
+                <div style="font-size:.82rem;font-weight:600">Publicar</div>
+                <div style="font-size:.72rem;opacity:.6">Nuevo producto</div>
+              </a>
+            </div>
+            <div class="col-6 col-md-3">
+              <a href="#" class="panel-action-card" onclick="openAdminIfLogged(event)">
+                <div class="panel-action-icon"><i class="bi bi-boxes"></i></div>
+                <div style="font-size:.82rem;font-weight:600">Inventario</div>
+                <div style="font-size:.72rem;opacity:.6">Mis productos</div>
+              </a>
+            </div>
+            <div class="col-6 col-md-3">
+              <a href="#" class="panel-action-card" onclick="openPedidosRecibidos(event)">
+                <div class="panel-action-icon"><i class="bi bi-inbox"></i></div>
+                <div style="font-size:.82rem;font-weight:600">Pedidos</div>
+                <div style="font-size:.72rem;opacity:.6">Ver recibidos</div>
+              </a>
+            </div>
+            <div class="col-6 col-md-3">
+              <a href="#" class="panel-action-card" onclick="openEstadisticas(event)">
+                <div class="panel-action-icon"><i class="bi bi-graph-up-arrow"></i></div>
+                <div style="font-size:.82rem;font-weight:600">Estadísticas</div>
+                <div style="font-size:.72rem;opacity:.6">Ver ventas</div>
+              </a>
+            </div>
+          </div>
+          <div style="margin-top:1.5rem;background:rgba(255,255,255,0.07);border-radius:14px;padding:1rem;display:flex;align-items:center;gap:12px">
+            <i class="bi bi-shield-check" style="font-size:1.4rem;color:#95d5b2"></i>
+            <div>
+              <div style="font-weight:600;font-size:.88rem">Cuenta verificada</div>
+              <div style="font-size:.75rem;opacity:.6">Tus transacciones están protegidas</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ ADMIN PANEL ═══════════════ -->
+<section class="py-4" id="adminSection" style="background:var(--cream);display:none">
+  <div class="container">
+    <div class="d-flex align-items-center gap-3 mb-3">
+      <div id="adminBadge" style="background:var(--green-pale);border-radius:12px;padding:8px 14px;display:inline-flex;align-items:center;gap:8px;font-size:.85rem;font-weight:600;color:var(--green-dark)">
+        <i class="bi bi-person-badge-fill"></i> <span id="adminBadgeText">Panel del Agricultor</span>
+      </div>
+    </div>
+    <div id="adminPanel">
+      <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+        <h5 style="font-family:'Playfair Display',serif;margin:0">Gestión de Productos</h5>
+        <button class="btn d-flex align-items-center gap-2" style="background:var(--green-mid);color:white;border-radius:12px;font-size:.88rem;font-weight:600;padding:0.55rem 1.2rem" data-bs-toggle="modal" data-bs-target="#productModal" onclick="openAddModal()">
+          <i class="bi bi-plus-lg"></i> Agregar producto
+        </button>
+      </div>
+      <div class="table-responsive">
+        <table class="table admin-table align-middle">
+          <thead>
+            <tr>
+              <th>Foto</th>
+              <th>Emoji</th>
+              <th>Nombre</th>
+              <th>Categoría</th>
+              <th>Precio</th>
+              <th>Unidad</th>
+              <th>Origen</th>
+              <th>Badge</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="adminTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ REGISTER ═══════════════ -->
+<section class="py-5" id="registro" style="background:white">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-10">
+        <div class="row g-0 align-items-center">
+          <div class="col-lg-5 d-none d-lg-block pe-5">
+            <div class="section-label">Bienvenido</div>
+            <h2 class="section-title mb-3">Crea tu <span>cuenta</span></h2>
+            <p style="color:var(--muted);font-size:.93rem;line-height:1.7">Únete a la comunidad agrícola más grande de Costa Rica. Empieza a comprar o vender en minutos.</p>
+            <ul class="list-unstyled mt-3" style="font-size:.88rem;color:var(--muted)">
+              <li class="mb-2"><i class="bi bi-check-circle-fill me-2" style="color:var(--green-light)"></i>Sin costo de registro</li>
+              <li class="mb-2"><i class="bi bi-check-circle-fill me-2" style="color:var(--green-light)"></i>Pagos seguros y protegidos</li>
+              <li class="mb-2"><i class="bi bi-check-circle-fill me-2" style="color:var(--green-light)"></i>Soporte 24/7 en español</li>
+            </ul>
+          </div>
+          <div class="col-lg-7">
+            <div class="register-card">
+              <h5 style="font-family:'Playfair Display',serif;margin-bottom:1.5rem">Crear cuenta nueva</h5>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label">Nombre completo</label>
+                  <input type="text" class="form-control" id="regNombre" placeholder="Juan Pérez">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Teléfono</label>
+                  <input type="tel" class="form-control" id="regTelefono" placeholder="+506 0000-0000">
+                </div>
+                <div class="col-12">
+                  <label class="form-label">Correo electrónico</label>
+                  <input type="email" class="form-control" id="regEmail" placeholder="correo@ejemplo.com">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Contraseña</label>
+                  <input type="password" class="form-control" id="regPass" placeholder="•••••••• (mín. 6 caracteres)">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Tipo de cuenta</label>
+                  <select class="form-select" id="regTipo">
+                    <option value="cliente">Cliente</option>
+                    <option value="agricultor">Agricultor</option>
+                    <option value="empresa">Empresa</option>
+                  </select>
+                </div>
+                <div class="col-12">
+                  <div id="registerError" class="text-danger" style="font-size:.82rem;display:none;margin-bottom:.5rem">
+                    <i class="bi bi-exclamation-circle me-1"></i>
+                  </div>
+                  <div class="form-check" style="font-size:.85rem">
+                    <input class="form-check-input" type="checkbox" id="terms">
+                    <label class="form-check-label text-muted" for="terms">
+                      Acepto los <a href="#" style="color:var(--green-mid)">términos y condiciones</a>
+                    </label>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <button class="btn-register" id="registerBtn" onclick="doRegister()">Crear cuenta gratis</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ FOOTER ═══════════════ -->
+<footer>
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-lg-4">
+        <div style="font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:800;color:white;margin-bottom:1rem;display:flex;align-items:center;gap:12px">
+          <!-- Logo blanco para footer oscuro -->
+          <svg width="36" height="36" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="50" cy="55" r="36" fill="none" stroke="rgba(255,255,255,0.85)" stroke-width="4.5"/>
+            <path d="M50 72 Q50 58 50 50" stroke="rgba(255,255,255,0.85)" stroke-width="4" stroke-linecap="round" fill="none"/>
+            <path d="M50 50 Q38 42 32 28 Q44 30 50 50Z" fill="rgba(255,255,255,0.85)"/>
+            <path d="M50 50 Q62 42 68 28 Q56 30 50 50Z" fill="rgba(255,255,255,0.85)"/>
+            <path d="M50 50 Q50 36 50 22 Q56 30 50 50Z" fill="#95d5b2"/>
+            <line x1="50" y1="61" x2="50" y2="73" stroke="rgba(255,255,255,0.85)" stroke-width="4" stroke-linecap="round"/>
+            <line x1="44" y1="67" x2="56" y2="67" stroke="rgba(255,255,255,0.85)" stroke-width="4" stroke-linecap="round"/>
+          </svg>
+          AgriPlusCR
+        </div>
+        <p style="font-size:.85rem;line-height:1.7">Conectando el campo con la mesa desde 2026. La plataforma agrícola más confiable de Costa Rica.</p>
+        <div class="d-flex gap-3 mt-3">
+          <a href="https://www.facebook.com/share/18caH49JJv/?mibextid=wwXIfr" target="_blank" rel="noopener" style="width:34px;height:34px;background:rgba(255,255,255,0.1);border-radius:8px;display:flex;align-items:center;justify-content:center;color:white"><i class="bi bi-facebook"></i></a>
+          <a href="https://instagram.com/agripluscr" target="_blank" rel="noopener" style="width:34px;height:34px;background:rgba(255,255,255,0.1);border-radius:8px;display:flex;align-items:center;justify-content:center;color:white"><i class="bi bi-instagram"></i></a>
+          <a href="https://wa.me/50600000000" target="_blank" rel="noopener" style="width:34px;height:34px;background:rgba(255,255,255,0.1);border-radius:8px;display:flex;align-items:center;justify-content:center;color:white"><i class="bi bi-whatsapp"></i></a>
+        </div>
+      </div>
+      <div class="col-6 col-lg-2">
+        <h5>Plataforma</h5>
+        <a href="#">Cómo funciona</a>
+        <a href="#">Para agricultores</a>
+        <a href="#">Para empresas</a>
+        <a href="#">Precios</a>
+      </div>
+      <div class="col-6 col-lg-2">
+        <h5>Soporte</h5>
+        <a href="#">Centro de ayuda</a>
+        <a href="#">Contacto</a>
+        <a href="#">Reportar problema</a>
+        <a href="#">WhatsApp</a>
+      </div>
+      <div class="col-lg-4">
+        <h5>Newsletter</h5>
+        <p style="font-size:.83rem">Recibe noticias agrícolas y ofertas especiales.</p>
+        <div class="input-group mt-2">
+          <input type="email" class="form-control" placeholder="tu@correo.com" style="border-radius:10px 0 0 10px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:white">
+          <button class="btn" style="background:var(--green-light);color:white;border-radius:0 10px 10px 0;font-size:.85rem;font-weight:600" onclick="doNewsletter(this)">Suscribir</button>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom d-flex flex-wrap justify-content-between align-items-center gap-2">
+      <span>© 2026 AgriPlusCR. Todos los derechos reservados.</span>
+      <div class="d-flex gap-3">
+        <a href="#">Privacidad</a>
+        <a href="#">Términos</a>
+        <a href="#">Cookies</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ═══════════════ CART OFFCANVAS ═══════════════ -->
+<div class="offcanvas offcanvas-end" id="cartSidebar">
+  <div class="offcanvas-header border-bottom">
+    <h5 class="offcanvas-title" style="font-family:'Playfair Display',serif">Mi Carrito</h5>
+    <button class="btn-close" data-bs-dismiss="offcanvas"></button>
+  </div>
+  <div class="offcanvas-body">
+    <div id="cartItems">
+      <div class="text-center py-5 text-muted" id="emptyCart">
+        <div style="font-size:3rem;margin-bottom:1rem">🛒</div>
+        <p style="font-size:.9rem">Tu carrito está vacío</p>
+        <a href="#productos" data-bs-dismiss="offcanvas" class="btn-hero-primary text-decoration-none" style="font-size:.85rem;padding:.6rem 1.5rem">Ver productos</a>
+      </div>
+    </div>
+    <div id="cartSummary" style="display:none">
+      <div class="cart-total">
+        <div class="d-flex justify-content-between mb-3">
+          <span style="font-size:.9rem;opacity:.8">Total del pedido</span>
+          <span style="font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700" id="cartTotalDisplay">₡0</span>
+        </div>
+        <button class="w-100 btn" style="background:var(--amber);color:white;border-radius:12px;font-weight:600;padding:.7rem" onclick="confirmOrder()">
+          <i class="bi bi-lightning-fill me-1"></i> Confirmar pedido
+        </button>
+        <button class="w-100 btn mt-2" style="background:rgba(255,255,255,0.1);color:white;border-radius:12px;font-weight:500;font-size:.85rem;padding:.5rem" onclick="clearCart()">
+          Vaciar carrito
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ LOGIN MODAL ═══════════════ -->
+<div class="modal fade" id="loginModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered" style="max-width:420px">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Iniciar sesión</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+        <div class="mb-3">
+          <label class="form-label">Correo electrónico</label>
+          <input type="email" class="form-control" id="loginEmail" placeholder="correo@ejemplo.com">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Contraseña</label>
+          <input type="password" class="form-control" id="loginPass" placeholder="••••••••">
+        </div>
+        <div id="loginError" class="text-danger" style="font-size:.82rem;display:none;margin-bottom:.75rem">
+          <i class="bi bi-exclamation-circle me-1"></i> Credenciales incorrectas.
+        </div>
+        <button class="btn-register" onclick="doLogin()">Entrar</button>
+        <div class="d-flex justify-content-between mt-3" style="font-size:.82rem">
+          <a href="#" onclick="doForgotPassword(event)" style="color:var(--muted)">¿Olvidaste tu contraseña?</a>
+          <a href="#registro" data-bs-dismiss="modal" style="color:var(--green-mid);font-weight:600">Regístrate gratis</a>
+        </div>
+        <div id="forgotMsg" style="display:none;margin-top:.75rem;font-size:.82rem;color:var(--green-mid);background:var(--green-pale);border-radius:8px;padding:.5rem .75rem">
+          <i class="bi bi-check-circle me-1"></i><span id="forgotMsgText"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ PRODUCT MODAL ═══════════════ -->
+<div class="modal fade" id="productModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="productModalTitle">Agregar producto</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+        <input type="hidden" id="editId">
+        <input type="hidden" id="pImageUrl">
+        <div class="row g-3">
+          <div class="col-12">
+            <label class="form-label">Foto del producto</label>
+            <div id="photoUploadArea" style="border:2px dashed var(--border);border-radius:12px;padding:1rem;text-align:center;cursor:pointer;transition:border-color .2s;position:relative" onclick="document.getElementById('pImageFile').click()">
+              <div id="photoPlaceholder">
+                <i class="bi bi-cloud-arrow-up" style="font-size:1.8rem;color:var(--muted)"></i>
+                <div style="font-size:.82rem;color:var(--muted);margin-top:4px">Clic para subir foto (JPG, PNG — máx. 2MB)</div>
+              </div>
+              <img id="photoPreview" src="" alt="" style="display:none;max-height:140px;border-radius:8px;object-fit:cover;max-width:100%">
+              <div id="uploadProgressWrap" style="display:none;margin-top:8px">
+                <div style="background:var(--border);border-radius:6px;height:6px;overflow:hidden">
+                  <div id="uploadProgressBar" style="height:100%;background:var(--green-mid);width:0%;transition:width .2s"></div>
+                </div>
+                <div id="uploadProgressText" style="font-size:.75rem;color:var(--muted);margin-top:4px">Subiendo...</div>
+              </div>
+            </div>
+            <input type="file" id="pImageFile" accept="image/*" style="display:none" onchange="handleImageSelect(this)">
+          </div>
+          <div class="col-3">
+            <label class="form-label">Emoji</label>
+            <input type="text" class="form-control text-center" id="pEmoji" placeholder="🥦" maxlength="4">
+          </div>
+          <div class="col-9">
+            <label class="form-label">Nombre del producto</label>
+            <input type="text" class="form-control" id="pName" placeholder="Ej: Brócoli orgánico">
+          </div>
+          <div class="col-6">
+            <label class="form-label">Categoría</label>
+            <select class="form-select" id="pCategory">
+              <option value="verdura">🥬 Verdura</option>
+              <option value="fruta">🍓 Fruta</option>
+              <option value="tuberculo">🥔 Tubérculo</option>
+              <option value="grano">🌽 Grano</option>
+            </select>
+          </div>
+          <div class="col-3">
+            <label class="form-label">Precio (₡)</label>
+            <input type="number" class="form-control" id="pPrice" placeholder="1200">
+          </div>
+          <div class="col-3">
+            <label class="form-label">Unidad</label>
+            <input type="text" class="form-control" id="pUnit" placeholder="kg">
+          </div>
+          <div class="col-8">
+            <label class="form-label">Origen / Agricultor</label>
+            <input type="text" class="form-control" id="pOrigin" placeholder="Ej: Finca Los Olivos, Cartago">
+          </div>
+          <div class="col-4">
+            <label class="form-label">Badge</label>
+            <select class="form-select" id="pBadge">
+              <option value="">Ninguno</option>
+              <option value="organic">Orgánico</option>
+              <option value="promo">Promo</option>
+            </select>
+          </div>
+        </div>
+        <div id="productModalError" class="text-danger mt-2" style="font-size:.82rem;display:none">Por favor completa todos los campos requeridos.</div>
+      </div>
+      <div class="modal-footer border-top-0 pt-0 px-4 pb-4">
+        <button class="btn" style="border-radius:10px;border:1.5px solid var(--border);color:var(--muted);font-size:.88rem" data-bs-dismiss="modal">Cancelar</button>
+        <button class="btn" style="background:var(--green-mid);color:white;border-radius:10px;font-weight:600;font-size:.88rem;padding:.5rem 1.5rem" onclick="saveProduct()">
+          Guardar producto
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ MIS PEDIDOS (cliente) ═══════════════ -->
+<div class="modal fade" id="misPedidosModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-bag-check me-2"></i>Mis Pedidos</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4" id="misPedidosBody">
+        <div class="text-center py-4 text-muted"><div class="spinner-border spinner-border-sm me-2"></div>Cargando...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ PEDIDOS RECIBIDOS (agricultor/admin) ═══════════════ -->
+<div class="modal fade" id="pedidosRecibidosModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-inbox me-2"></i>Pedidos Recibidos</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4" id="pedidosRecibidosBody">
+        <div class="text-center py-4 text-muted"><div class="spinner-border spinner-border-sm me-2"></div>Cargando...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast-custom" id="toastEl"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Firebase SDKs -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, collection, addDoc, setDoc, getDocs, doc, getDoc, updateDoc, deleteDoc, query, where, orderBy, serverTimestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDDpDwJHzcjE1kI8krI7FUEqhy4mZtj1zU",
+  authDomain: "agripluscr.firebaseapp.com",
+  projectId: "agripluscr",
+  storageBucket: "agripluscr.firebasestorage.app",
+  messagingSenderId: "178081473931",
+  appId: "1:178081473931:web:f4b0b7f8efb99c8f9f7b8e",
+  measurementId: "G-XQ81G821DD"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// ── Estado global ──
+let currentUser = null;
+let currentUserData = null;
+let allProducts = [];
+let cart = [];
+let currentFilter = "all";
+
+// ── Exponer funciones al ámbito global ──
+window._fb = { auth, db, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, where, serverTimestamp };
+
+// ══════════════════════════════════════
+//  AUTH STATE LISTENER
+// ══════════════════════════════════════
+onAuthStateChanged(auth, async (user) => {
+  currentUser = user;
+  if (user) {
+    // Cargar datos del perfil desde Firestore por UID directo
+    try {
+      const snap = await getDoc(doc(db, "usuarios", user.uid));
+      if (snap.exists()) currentUserData = snap.data();
+      else {
+        // fallback: buscar por campo uid (registros antiguos con addDoc)
+        const q = await getDocs(query(collection(db, "usuarios"), where("uid", "==", user.uid)));
+        if (!q.empty) currentUserData = q.docs[0].data();
+      }
+    } catch(e) { currentUserData = null; }
+
+    const name = currentUserData?.nombre || user.email;
+    const role = currentUserData?.tipo || "cliente";
+    document.getElementById("loginBtnText").textContent = name.split(" ")[0] + " ▾";
+    document.getElementById("loginToggleBtn").classList.add("logged");
+    document.getElementById("misPedidosBtn").style.display = "flex";
+
+    if (role === "agricultor" || role === "admin") {
+      document.getElementById("adminSection").style.display = "block";
+      document.getElementById("adminPanel").style.display = "block";
+      // Badge dinámico según rol
+      const badge = document.getElementById("adminBadge");
+      const badgeText = document.getElementById("adminBadgeText");
+      if (role === "admin") {
+        badge.style.background = "var(--amber-light)";
+        badge.style.color = "#92400e";
+        badge.querySelector("i").className = "bi bi-shield-lock-fill";
+        badgeText.textContent = "Modo Administrador activo";
+      } else {
+        badge.style.background = "var(--green-pale)";
+        badge.style.color = "var(--green-dark)";
+        badge.querySelector("i").className = "bi bi-person-badge-fill";
+        badgeText.textContent = "Panel del Agricultor";
+      }
+      renderAdminTable();
+    }
+    showToast(`👋 ¡Bienvenido, ${name.split(" ")[0]}!`);
+  } else {
+    currentUserData = null;
+    document.getElementById("loginBtnText").textContent = "Iniciar sesión";
+    document.getElementById("loginToggleBtn").classList.remove("logged");
+    document.getElementById("misPedidosBtn").style.display = "none";
+    document.getElementById("adminSection").style.display = "none";
+  }
+  loadAllProducts();
+});
+
+// ══════════════════════════════════════
+//  CARGAR PRODUCTOS DESDE FIRESTORE (tiempo real)
+// ══════════════════════════════════════
+function loadAllProducts() {
+  onSnapshot(collection(db, "productos"), (snap) => {
+    allProducts = snap.docs.map(d => ({ firestoreId: d.id, ...d.data() }));
+    filterProducts();
+    if (currentUser && (currentUserData?.tipo === "agricultor" || currentUserData?.tipo === "admin")) {
+      renderAdminTable();
+    }
+  }, () => {
+    // Si Firestore falla, mostrar productos de ejemplo
+    allProducts = [
+      {firestoreId:"local1",emoji:"🍅",name:"Tomate cherry",category:"verdura",price:1200,unit:"kg",origin:"Finca Montealegre, Alajuela",badge:"organic",uid:"demo"},
+      {firestoreId:"local2",emoji:"🥔",name:"Papa criolla",category:"tuberculo",price:900,unit:"kg",origin:"Productores Unidos, Cartago",badge:"",uid:"demo"},
+      {firestoreId:"local3",emoji:"🥬",name:"Lechuga romana",category:"verdura",price:800,unit:"unidad",origin:"Huerta Las Brumas, Heredia",badge:"organic",uid:"demo"},
+      {firestoreId:"local4",emoji:"🌽",name:"Maíz tierno",category:"grano",price:1500,unit:"kg",origin:"Cooperativa Norte, Guanacaste",badge:"promo",uid:"demo"},
+      {firestoreId:"local5",emoji:"🥕",name:"Zanahoria baby",category:"verdura",price:750,unit:"kg",origin:"Finca La Cima, San José",badge:"",uid:"demo"},
+      {firestoreId:"local6",emoji:"🍓",name:"Fresa premium",category:"fruta",price:3200,unit:"kg",origin:"Jardines Turrialba, Cartago",badge:"promo",uid:"demo"},
+      {firestoreId:"local7",emoji:"🥦",name:"Brócoli fresco",category:"verdura",price:1100,unit:"kg",origin:"Finca Verde Vivo, Heredia",badge:"organic",uid:"demo"},
+      {firestoreId:"local8",emoji:"🍋",name:"Limón tico",category:"fruta",price:600,unit:"kg",origin:"Rancho El Sol, Guanacaste",badge:"",uid:"demo"}
+    ];
+    filterProducts();
+  });
+}
+
+// ══════════════════════════════════════
+//  RENDER PRODUCTOS
+// ══════════════════════════════════════
+function renderProducts() {
+  const search = (document.getElementById("searchInput").value || "").toLowerCase();
+  const grid = document.getElementById("productsGrid");
+  const empty = document.getElementById("emptyState");
+  const filtered = allProducts.filter(p => {
+    const matchCat = currentFilter === "all" || p.category === currentFilter;
+    const matchSearch = !search || p.name.toLowerCase().includes(search);
+    return matchCat && matchSearch;
+  });
+  if (!filtered.length) { grid.innerHTML = ""; empty.style.display = "block"; return; }
+  empty.style.display = "none";
+  grid.innerHTML = filtered.map(p => `
+    <div class="col-6 col-md-4 col-lg-3">
+      <div class="product-card">
+        <div class="product-img" style="${p.imageUrl ? 'padding:0;' : ''}">
+          ${p.imageUrl
+            ? `<img src="${p.imageUrl}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;border-radius:20px 20px 0 0">`
+            : `<span style="font-size:3.5rem">${p.emoji}</span>`
+          }
+          ${p.badge ? `<span class="product-badge ${p.badge}">${p.badge==="organic"?"Orgánico":p.badge==="promo"?"Promo":"Nuevo"}</span>` : ""}
+        </div>
+        <div class="product-body">
+          <div class="product-name">${p.imageUrl ? '' : ''}${p.name}</div>
+          <div class="product-origin"><i class="bi bi-geo-alt me-1"></i>${p.origin || "Costa Rica"}</div>
+          <div class="product-price">₡${p.price.toLocaleString()} <small>/ ${p.unit}</small></div>
+        </div>
+        <div class="product-footer">
+          <button class="btn-add" onclick="addToCart('${p.firestoreId}')">
+            <i class="bi bi-bag-plus"></i> Agregar
+          </button>
+        </div>
+      </div>
+    </div>`).join("");
+}
+
+window.filterProducts = function() { renderProducts(); };
+
+document.getElementById("categoryFilter").addEventListener("click", e => {
+  const pill = e.target.closest(".category-pill");
+  if (!pill) return;
+  document.querySelectorAll(".category-pill").forEach(p => p.classList.remove("active"));
+  pill.classList.add("active");
+  currentFilter = pill.dataset.cat;
+  renderProducts();
+});
+
+// ══════════════════════════════════════
+//  CARRITO
+// ══════════════════════════════════════
+window.addToCart = function(firestoreId) {
+  const prod = allProducts.find(p => p.firestoreId === firestoreId);
+  if (!prod) return;
+  const existing = cart.find(c => c.firestoreId === firestoreId);
+  if (existing) existing.qty++;
+  else cart.push({ ...prod, qty: 1 });
+  renderCart();
+  showToast(`🛒 ${prod.name} agregado al carrito`);
+};
+
+window.removeFromCart = function(id) { cart = cart.filter(c => c.firestoreId !== id); renderCart(); };
+window.clearCart = function() { cart = []; renderCart(); };
+
+function renderCart() {
+  const countEl = document.getElementById("cartCount");
+  const total = cart.reduce((s, c) => s + c.price * c.qty, 0);
+  const count = cart.reduce((s, c) => s + c.qty, 0);
+  countEl.textContent = count;
+  const itemsEl = document.getElementById("cartItems");
+  const summaryEl = document.getElementById("cartSummary");
+  const emptyEl = document.getElementById("emptyCart");
+  if (!cart.length) {
+    emptyEl.style.display = "block";
+    summaryEl.style.display = "none";
+    itemsEl.innerHTML = "";
+    itemsEl.appendChild(emptyEl);
+    return;
+  }
+  emptyEl.style.display = "none";
+  itemsEl.innerHTML = cart.map(c => `
+    <div class="cart-item">
+      <div class="cart-item-emoji">${c.emoji}</div>
+      <div style="flex:1">
+        <div style="font-weight:600;font-size:.88rem">${c.name}</div>
+        <div style="font-size:.78rem;color:var(--muted)">${c.qty} × ₡${c.price.toLocaleString()}</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-weight:700;font-size:.9rem;color:var(--green-dark)">₡${(c.price * c.qty).toLocaleString()}</div>
+        <button onclick="removeFromCart('${c.firestoreId}')" style="background:none;border:none;color:var(--muted);font-size:.75rem;cursor:pointer;padding:2px 0">
+          <i class="bi bi-trash3"></i> quitar
+        </button>
+      </div>
+    </div>`).join("");
+  summaryEl.style.display = "block";
+  document.getElementById("cartTotalDisplay").textContent = "₡" + total.toLocaleString();
+}
+
+// ══════════════════════════════════════
+//  LOGIN / LOGOUT
+// ══════════════════════════════════════
+window.toggleLoginModal = function() {
+  if (currentUser) { doLogout(); return; }
+  new bootstrap.Modal(document.getElementById("loginModal")).show();
+};
+
+window.doLogin = async function() {
+  const email = document.getElementById("loginEmail").value.trim();
+  const pass = document.getElementById("loginPass").value;
+  const errEl = document.getElementById("loginError");
+  errEl.style.display = "none";
+  if (!email || !pass) { errEl.textContent = "Completa todos los campos."; errEl.style.display = "block"; return; }
+  try {
+    await signInWithEmailAndPassword(auth, email, pass);
+    bootstrap.Modal.getInstance(document.getElementById("loginModal")).hide();
+  } catch(e) {
+    errEl.textContent = "Correo o contraseña incorrectos.";
+    errEl.style.display = "block";
+  }
+};
+
+async function doLogout() {
+  await signOut(auth);
+  document.getElementById("adminSection").style.display = "none";
+  showToast("👋 Sesión cerrada");
+}
+
+// ══════════════════════════════════════
+//  REGISTRO DE CUENTA
+// ══════════════════════════════════════
+window.doRegister = async function() {
+  const nombre = document.getElementById("regNombre").value.trim();
+  const telefono = document.getElementById("regTelefono").value.trim();
+  const email = document.getElementById("regEmail").value.trim();
+  const pass = document.getElementById("regPass").value;
+  const tipo = document.getElementById("regTipo").value;
+  const terms = document.getElementById("terms").checked;
+  const errEl = document.getElementById("registerError");
+  const btnEl = document.getElementById("registerBtn");
+
+  errEl.style.display = "none";
+  if (!nombre || !email || !pass || !tipo) { errEl.textContent = "Completa todos los campos requeridos."; errEl.style.display = "block"; return; }
+  if (!terms) { errEl.textContent = "Debes aceptar los términos y condiciones."; errEl.style.display = "block"; return; }
+  if (pass.length < 6) { errEl.textContent = "La contraseña debe tener al menos 6 caracteres."; errEl.style.display = "block"; return; }
+
+  btnEl.textContent = "Creando cuenta...";
+  btnEl.disabled = true;
+  try {
+    const cred = await createUserWithEmailAndPassword(auth, email, pass);
+    await setDoc(doc(db, "usuarios", cred.user.uid), {
+      uid: cred.user.uid,
+      nombre, telefono, email, tipo,
+      createdAt: serverTimestamp()
+    });
+    showToast("✅ ¡Cuenta creada exitosamente!");
+    // Limpiar formulario
+    ["regNombre","regTelefono","regEmail","regPass"].forEach(id => document.getElementById(id).value = "");
+    document.getElementById("terms").checked = false;
+  } catch(e) {
+    let msg = "Error al crear la cuenta.";
+    if (e.code === "auth/email-already-in-use") msg = "Este correo ya tiene una cuenta registrada.";
+    if (e.code === "auth/invalid-email") msg = "Correo electrónico inválido.";
+    errEl.textContent = msg;
+    errEl.style.display = "block";
+  }
+  btnEl.textContent = "Crear cuenta gratis";
+  btnEl.disabled = false;
+};
+
+// ══════════════════════════════════════
+//  CLOUDINARY — SUBIDA DE IMÁGENES
+// ══════════════════════════════════════
+const CLOUDINARY_CLOUD = "dljvu1fz0";
+const CLOUDINARY_PRESET = "agriplus_upload";
+
+window.handleImageSelect = async function(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 2 * 1024 * 1024) { showToast("❌ La foto debe pesar menos de 2MB"); input.value=""; return; }
+
+  // Preview local inmediato
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById("photoPreview").src = e.target.result;
+    document.getElementById("photoPreview").style.display = "block";
+    document.getElementById("photoPlaceholder").style.display = "none";
+  };
+  reader.readAsDataURL(file);
+
+  // Subir a Cloudinary
+  const wrap = document.getElementById("uploadProgressWrap");
+  const bar = document.getElementById("uploadProgressBar");
+  const txt = document.getElementById("uploadProgressText");
+  wrap.style.display = "block";
+  bar.style.width = "0%";
+  txt.textContent = "Subiendo...";
+
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("upload_preset", CLOUDINARY_PRESET);
+
+  try {
+    const xhr = new XMLHttpRequest();
+    xhr.upload.onprogress = e => {
+      if (e.lengthComputable) {
+        const pct = Math.round(e.loaded / e.total * 100);
+        bar.style.width = pct + "%";
+        txt.textContent = `Subiendo... ${pct}%`;
+      }
+    };
+    xhr.onload = () => {
+      const res = JSON.parse(xhr.responseText);
+      if (res.secure_url) {
+        document.getElementById("pImageUrl").value = res.secure_url;
+        bar.style.width = "100%";
+        txt.textContent = "✓ Foto lista";
+        bar.style.background = "var(--green-light)";
+      } else {
+        txt.textContent = "❌ Error al subir";
+      }
+    };
+    xhr.onerror = () => { txt.textContent = "❌ Error de conexión"; };
+    xhr.open("POST", `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`);
+    xhr.send(formData);
+  } catch(e) {
+    txt.textContent = "❌ Error al subir foto";
+  }
+};
+
+// ══════════════════════════════════════
+//  CONFIRMAR PEDIDO — FIRESTORE
+// ══════════════════════════════════════
+window.confirmOrder = async function() {
+  if (!cart.length) return;
+  const total = cart.reduce((s, c) => s + c.price * c.qty, 0);
+  const pedido = {
+    items: cart.map(c => ({ id: c.firestoreId, name: c.name, emoji: c.emoji, price: c.price, qty: c.qty, unit: c.unit })),
+    total,
+    uid: currentUser?.uid || "anonimo",
+    clienteNombre: currentUserData?.nombre || "Visitante",
+    clienteEmail: currentUser?.email || "",
+    estado: "pendiente",
+    createdAt: serverTimestamp()
+  };
+  try {
+    await addDoc(collection(db, "pedidos"), pedido);
+    showToast("🎉 ¡Pedido confirmado! Te contactaremos pronto.");
+    cart = [];
+    renderCart();
+    const offcanvas = bootstrap.Offcanvas.getInstance(document.getElementById("cartSidebar"));
+    if (offcanvas) offcanvas.hide();
+  } catch(e) {
+    showToast("❌ Error al confirmar pedido. Intentá de nuevo.");
+  }
+};
+
+// ══════════════════════════════════════
+//  RECUPERAR CONTRASEÑA
+// ══════════════════════════════════════
+window.doForgotPassword = async function(e) {
+  e.preventDefault();
+  const email = document.getElementById("loginEmail").value.trim();
+  const msgEl = document.getElementById("forgotMsg");
+  const msgText = document.getElementById("forgotMsgText");
+  if (!email) {
+    msgEl.style.background = "var(--amber-light)";
+    msgEl.style.color = "#92400e";
+    msgText.textContent = "Escribí tu correo arriba primero.";
+    msgEl.style.display = "block";
+    return;
+  }
+  try {
+    await sendPasswordResetEmail(auth, email);
+    msgEl.style.background = "var(--green-pale)";
+    msgEl.style.color = "var(--green-dark)";
+    msgText.textContent = `Enviamos un link de recuperación a ${email}`;
+    msgEl.style.display = "block";
+  } catch(e) {
+    msgEl.style.background = "var(--amber-light)";
+    msgEl.style.color = "#92400e";
+    msgText.textContent = "No encontramos una cuenta con ese correo.";
+    msgEl.style.display = "block";
+  }
+};
+
+// ══════════════════════════════════════
+//  PANEL AGRICULTOR — CRUD PRODUCTOS
+// ══════════════════════════════════════
+window.openAdminIfLogged = function(e) {
+  if(e) e.preventDefault();
+  if (!currentUser) {
+    showToast("🔒 Debés iniciar sesión para acceder");
+    new bootstrap.Modal(document.getElementById("loginModal")).show();
+    return;
+  }
+  const role = currentUserData?.tipo;
+  if (role !== "agricultor" && role !== "admin") {
+    showToast("🌾 Solo agricultores pueden publicar productos");
+    return;
+  }
+  document.getElementById("adminSection").scrollIntoView({ behavior: "smooth" });
+};
+
+function renderAdminTable() {
+  const myProducts = currentUserData?.tipo === "admin"
+    ? allProducts
+    : allProducts.filter(p => p.uid === currentUser?.uid);
+
+  const tbody = document.getElementById("adminTableBody");
+  if (!myProducts.length) {
+    tbody.innerHTML = `<tr><td colspan="8" class="text-center py-4" style="color:var(--muted);font-size:.9rem">No tenés productos publicados aún. ¡Agregá el primero!</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = myProducts.map(p => `
+    <tr>
+      <td style="width:52px">
+        ${p.imageUrl
+          ? `<img src="${p.imageUrl}" alt="" style="width:44px;height:44px;object-fit:cover;border-radius:8px;border:1px solid var(--border)">`
+          : `<div style="width:44px;height:44px;background:var(--green-pale);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.4rem">${p.emoji}</div>`
+        }
+      </td>
+      <td style="font-size:1.4rem">${p.emoji}</td>
+      <td style="font-weight:500">${p.name}</td>
+      <td><span style="background:var(--green-pale);color:var(--green-dark);border-radius:6px;padding:2px 8px;font-size:.75rem;font-weight:600;text-transform:capitalize">${p.category}</span></td>
+      <td style="font-weight:600;color:var(--green-dark)">₡${p.price.toLocaleString()}</td>
+      <td style="color:var(--muted);font-size:.82rem">${p.unit}</td>
+      <td style="font-size:.78rem;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.origin || ""}</td>
+      <td>${p.badge ? `<span style="background:${p.badge==='organic'?'#d8f3dc':p.badge==='promo'?'var(--amber-light)':'#e0f2fe'};color:${p.badge==='organic'?'#1a5e35':p.badge==='promo'?'#92400e':'#0c4a6e'};border-radius:6px;padding:2px 8px;font-size:.72rem;font-weight:600;text-transform:capitalize">${p.badge}</span>` : '<span style="color:var(--muted);font-size:.78rem">—</span>'}</td>
+      <td>
+        <div class="d-flex gap-1">
+          <button class="btn-sm-green" data-bs-toggle="modal" data-bs-target="#productModal" onclick="openEditModal('${p.firestoreId}')"><i class="bi bi-pencil me-1"></i>Editar</button>
+          <button class="btn-sm-red" onclick="deleteProduct('${p.firestoreId}')"><i class="bi bi-trash3 me-1"></i>Eliminar</button>
+        </div>
+      </td>
+    </tr>`).join("");
+}
+
+window.openAddModal = function() {
+  document.getElementById("productModalTitle").textContent = "Agregar producto";
+  document.getElementById("editId").value = "";
+  document.getElementById("pImageUrl").value = "";
+  ["pEmoji","pName","pPrice","pUnit","pOrigin"].forEach(id => document.getElementById(id).value = "");
+  document.getElementById("pCategory").value = "verdura";
+  document.getElementById("pBadge").value = "";
+  document.getElementById("productModalError").style.display = "none";
+  // Reset foto
+  document.getElementById("photoPreview").style.display = "none";
+  document.getElementById("photoPreview").src = "";
+  document.getElementById("photoPlaceholder").style.display = "block";
+  document.getElementById("uploadProgressWrap").style.display = "none";
+  document.getElementById("uploadProgressBar").style.width = "0%";
+  document.getElementById("uploadProgressBar").style.background = "var(--green-mid)";
+  document.getElementById("pImageFile").value = "";
+};
+
+window.openEditModal = function(firestoreId) {
+  const p = allProducts.find(x => x.firestoreId === firestoreId);
+  if (!p) return;
+  document.getElementById("productModalTitle").textContent = "Editar producto";
+  document.getElementById("editId").value = firestoreId;
+  document.getElementById("pImageUrl").value = p.imageUrl || "";
+  document.getElementById("pEmoji").value = p.emoji;
+  document.getElementById("pName").value = p.name;
+  document.getElementById("pCategory").value = p.category;
+  document.getElementById("pPrice").value = p.price;
+  document.getElementById("pUnit").value = p.unit;
+  document.getElementById("pOrigin").value = p.origin || "";
+  document.getElementById("pBadge").value = p.badge || "";
+  document.getElementById("productModalError").style.display = "none";
+  // Mostrar foto existente si tiene
+  const preview = document.getElementById("photoPreview");
+  const placeholder = document.getElementById("photoPlaceholder");
+  const progressWrap = document.getElementById("uploadProgressWrap");
+  if (p.imageUrl) {
+    preview.src = p.imageUrl;
+    preview.style.display = "block";
+    placeholder.style.display = "none";
+  } else {
+    preview.style.display = "none";
+    preview.src = "";
+    placeholder.style.display = "block";
+  }
+  progressWrap.style.display = "none";
+  document.getElementById("pImageFile").value = "";
+};
+
+window.saveProduct = async function() {
+  const emoji = document.getElementById("pEmoji").value.trim();
+  const name = document.getElementById("pName").value.trim();
+  const price = parseInt(document.getElementById("pPrice").value);
+  const unit = document.getElementById("pUnit").value.trim();
+  const errEl = document.getElementById("productModalError");
+  if (!emoji || !name || !price || !unit) { errEl.textContent = "Por favor completa todos los campos requeridos."; errEl.style.display = "block"; return; }
+
+  // Bloquear si la foto aún se está subiendo
+  const progressText = document.getElementById("uploadProgressText").textContent;
+  if (progressText.includes("Subiendo")) { errEl.textContent = "Esperá a que termine de subir la foto."; errEl.style.display = "block"; return; }
+
+  errEl.style.display = "none";
+  const editId = document.getElementById("editId").value;
+  const prodData = {
+    emoji, name,
+    category: document.getElementById("pCategory").value,
+    price,
+    unit,
+    origin: document.getElementById("pOrigin").value.trim() || "Costa Rica",
+    badge: document.getElementById("pBadge").value,
+    imageUrl: document.getElementById("pImageUrl").value || "",
+    uid: currentUser.uid,
+    ownerName: currentUserData?.nombre || currentUser.email,
+    updatedAt: serverTimestamp()
+  };
+
+  try {
+    if (editId) {
+      await updateDoc(doc(db, "productos", editId), prodData);
+      showToast("✏️ Producto actualizado");
+    } else {
+      prodData.createdAt = serverTimestamp();
+      await addDoc(collection(db, "productos"), prodData);
+      showToast("✅ Producto publicado");
+    }
+    bootstrap.Modal.getInstance(document.getElementById("productModal")).hide();
+  } catch(e) {
+    errEl.textContent = "Error al guardar. Intentá de nuevo.";
+    errEl.style.display = "block";
+  }
+};
+
+window.deleteProduct = async function(firestoreId) {
+  if (!confirm("¿Seguro que querés eliminar este producto?")) return;
+  try {
+    await deleteDoc(doc(db, "productos", firestoreId));
+    showToast("🗑️ Producto eliminado");
+    await loadAllProducts();
+  } catch(e) {
+    showToast("❌ Error al eliminar");
+  }
+};
+
+// ══════════════════════════════════════
+//  TOAST
+// ══════════════════════════════════════
+let toastTimer;
+window.showToast = function(msg) {
+  const el = document.getElementById("toastEl");
+  el.innerHTML = msg;
+  el.style.display = "flex";
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.style.display = "none", 3000);
+};
+
+// ══════════════════════════════════════
+//  NEWSLETTER — GUARDAR EN FIRESTORE
+// ══════════════════════════════════════
+window.doNewsletter = async function(btn) {
+  const input = btn.previousElementSibling;
+  const email = input.value.trim();
+  if (!email || !email.includes("@")) { showToast("✉️ Escribí un correo válido"); return; }
+  try {
+    await addDoc(collection(db, "newsletter"), { email, createdAt: serverTimestamp() });
+    showToast("📧 ¡Suscrito exitosamente! Gracias.");
+    input.value = "";
+  } catch(e) {
+    showToast("❌ Error al suscribir. Intentá de nuevo.");
+  }
+};
+
+// ══════════════════════════════════════
+//  MIS PEDIDOS (cliente)
+// ══════════════════════════════════════
+const estadoColors = {
+  pendiente: { bg: "var(--amber-light)", color: "#92400e", label: "⏳ Pendiente" },
+  "en camino": { bg: "#e0f2fe", color: "#0c4a6e", label: "🚚 En camino" },
+  entregado: { bg: "var(--green-pale)", color: "var(--green-dark)", label: "✅ Entregado" },
+  cancelado: { bg: "#fee2e2", color: "#991b1b", label: "❌ Cancelado" }
+};
+
+window.openMisPedidos = async function() {
+  if (!currentUser) { showToast("🔒 Debés iniciar sesión"); return; }
+  const modal = new bootstrap.Modal(document.getElementById("misPedidosModal"));
+  modal.show();
+  const body = document.getElementById("misPedidosBody");
+  body.innerHTML = `<div class="text-center py-4 text-muted"><div class="spinner-border spinner-border-sm me-2"></div>Cargando...</div>`;
+  try {
+    const q = query(collection(db, "pedidos"), where("uid", "==", currentUser.uid));
+    const snap = await getDocs(q);
+    if (snap.empty) {
+      body.innerHTML = `<div class="text-center py-5"><div style="font-size:3rem;margin-bottom:1rem">🛒</div><p style="color:var(--muted)">Aún no tenés pedidos realizados.</p></div>`;
+      return;
+    }
+    const pedidos = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+      .sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+    body.innerHTML = pedidos.map(p => {
+      const est = estadoColors[p.estado] || estadoColors.pendiente;
+      const fecha = p.createdAt?.seconds ? new Date(p.createdAt.seconds * 1000).toLocaleDateString("es-CR") : "—";
+      const items = (p.items || []).map(i => `${i.emoji || ""} ${i.name} ×${i.qty}`).join(", ");
+      return `
+        <div style="border:1px solid var(--border);border-radius:14px;padding:1rem 1.25rem;margin-bottom:.75rem">
+          <div class="d-flex justify-content-between align-items-start gap-2 flex-wrap">
+            <div>
+              <div style="font-weight:600;font-size:.9rem;margin-bottom:4px">${items}</div>
+              <div style="font-size:.78rem;color:var(--muted)"><i class="bi bi-calendar3 me-1"></i>${fecha}</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-family:'Playfair Display',serif;font-weight:700;color:var(--green-dark);font-size:1.05rem">₡${(p.total||0).toLocaleString()}</div>
+              <span style="background:${est.bg};color:${est.color};border-radius:8px;padding:2px 10px;font-size:.75rem;font-weight:600">${est.label}</span>
+            </div>
+          </div>
+        </div>`;
+    }).join("");
+  } catch(e) {
+    body.innerHTML = `<p class="text-danger">Error al cargar pedidos.</p>`;
+  }
+};
+
+// ══════════════════════════════════════
+//  PEDIDOS RECIBIDOS (agricultor/admin)
+// ══════════════════════════════════════
+window.openPedidosRecibidos = async function(e) {
+  if (e) e.preventDefault();
+  if (!currentUser) { showToast("🔒 Debés iniciar sesión"); new bootstrap.Modal(document.getElementById("loginModal")).show(); return; }
+  const role = currentUserData?.tipo;
+  if (role !== "agricultor" && role !== "admin") { showToast("🌾 Solo agricultores o admins pueden ver pedidos"); return; }
+  const modal = new bootstrap.Modal(document.getElementById("pedidosRecibidosModal"));
+  modal.show();
+  const body = document.getElementById("pedidosRecibidosBody");
+  body.innerHTML = `<div class="text-center py-4 text-muted"><div class="spinner-border spinner-border-sm me-2"></div>Cargando...</div>`;
+  try {
+    const snap = await getDocs(collection(db, "pedidos"));
+    let pedidos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    if (role === "agricultor") {
+      const misIds = allProducts.filter(p => p.uid === currentUser.uid).map(p => p.firestoreId);
+      pedidos = pedidos.filter(p => (p.items || []).some(i => misIds.includes(i.id)));
+    }
+    pedidos.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+    if (!pedidos.length) {
+      body.innerHTML = `<div class="text-center py-5"><div style="font-size:3rem;margin-bottom:1rem">📭</div><p style="color:var(--muted)">No hay pedidos recibidos aún.</p></div>`;
+      return;
+    }
+    body.innerHTML = pedidos.map(p => {
+      const est = estadoColors[p.estado] || estadoColors.pendiente;
+      const fecha = p.createdAt?.seconds ? new Date(p.createdAt.seconds * 1000).toLocaleDateString("es-CR") : "—";
+      const items = (p.items || []).map(i => `${i.emoji || ""} ${i.name} ×${i.qty}`).join(", ");
+      return `
+        <div style="border:1px solid var(--border);border-radius:14px;padding:1rem 1.25rem;margin-bottom:.75rem">
+          <div class="d-flex justify-content-between align-items-start gap-2 flex-wrap">
+            <div style="flex:1">
+              <div style="font-weight:600;font-size:.88rem;margin-bottom:2px">${p.clienteNombre || "Cliente"} <span style="font-weight:400;color:var(--muted);font-size:.78rem">(${p.clienteEmail || ""})</span></div>
+              <div style="font-size:.82rem;color:var(--charcoal);margin-bottom:4px">${items}</div>
+              <div style="font-size:.75rem;color:var(--muted)"><i class="bi bi-calendar3 me-1"></i>${fecha}</div>
+            </div>
+            <div style="text-align:right;min-width:130px">
+              <div style="font-family:'Playfair Display',serif;font-weight:700;color:var(--green-dark);font-size:1.05rem;margin-bottom:6px">₡${(p.total||0).toLocaleString()}</div>
+              <select onchange="cambiarEstadoPedido('${p.id}', this.value)" style="border:1.5px solid var(--border);border-radius:8px;padding:3px 8px;font-size:.78rem;font-weight:600;background:${est.bg};color:${est.color};cursor:pointer">
+                ${["pendiente","en camino","entregado","cancelado"].map(s =>
+                  `<option value="${s}" ${p.estado===s?"selected":""}>${estadoColors[s]?.label||s}</option>`
+                ).join("")}
+              </select>
+            </div>
+          </div>
+        </div>`;
+    }).join("");
+  } catch(e) {
+    body.innerHTML = `<p class="text-danger">Error al cargar pedidos.</p>`;
+  }
+};
+
+window.cambiarEstadoPedido = async function(pedidoId, nuevoEstado) {
+  try {
+    await updateDoc(doc(db, "pedidos", pedidoId), { estado: nuevoEstado });
+    showToast(`✅ Estado actualizado: ${nuevoEstado}`);
+  } catch(e) {
+    showToast("❌ Error al actualizar estado");
+  }
+};
+
+// ══════════════════════════════════════
+//  ESTADÍSTICAS
+// ══════════════════════════════════════
+window.openEstadisticas = async function(e) {
+  if (e) e.preventDefault();
+  if (!currentUser) { showToast("🔒 Debés iniciar sesión"); return; }
+  const role = currentUserData?.tipo;
+  if (role !== "agricultor" && role !== "admin") { showToast("🌾 Solo agricultores o admins"); return; }
+  try {
+    const snap = await getDocs(collection(db, "pedidos"));
+    let pedidos = snap.docs.map(d => d.data());
+    if (role === "agricultor") {
+      const misIds = allProducts.filter(p => p.uid === currentUser.uid).map(p => p.firestoreId);
+      pedidos = pedidos.filter(p => (p.items || []).some(i => misIds.includes(i.id)));
+    }
+    const total = pedidos.reduce((s, p) => s + (p.total || 0), 0);
+    const entregados = pedidos.filter(p => p.estado === "entregado").length;
+    const pendientes = pedidos.filter(p => p.estado === "pendiente").length;
+    showToast(`📊 ${pedidos.length} pedidos · ₡${total.toLocaleString()} total · ${entregados} entregados · ${pendientes} pendientes`);
+  } catch(e) {
+    showToast("❌ Error al cargar estadísticas");
+  }
+};
+
+renderCart();
+</script>
+</body>
+</html>
