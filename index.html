@@ -501,7 +501,7 @@ footer a:hover { color: var(--green-light); }
           <a href="#productos" class="btn-hero-primary text-decoration-none">
             <i class="bi bi-bag-heart"></i> Explorar productos
           </a>
-          <a href="#registro" class="btn-hero-secondary text-decoration-none">Únete gratis →</a>
+          <a href="javascript:void(0)" onclick="document.getElementById('registro').scrollIntoView({behavior:'smooth'})" class="btn-hero-secondary text-decoration-none">Únete gratis →</a>
         </div>
         <div class="hero-stats">
           <div><span class="hero-stat-num">100%</span><span class="hero-stat-label">Producto nacional</span></div>
@@ -857,7 +857,7 @@ footer a:hover { color: var(--green-light); }
         <button class="btn-register" onclick="doLogin()">Entrar</button>
         <div class="d-flex justify-content-between mt-3" style="font-size:.82rem">
           <a href="#" onclick="doForgotPassword(event)" style="color:var(--muted)">¿Olvidaste tu contraseña?</a>
-          <a href="#registro" data-bs-dismiss="modal" style="color:var(--green-mid);font-weight:600">Regístrate gratis</a>
+          <a href="javascript:void(0)" data-bs-dismiss="modal" onclick="setTimeout(()=>document.getElementById('registro').scrollIntoView({behavior:'smooth'}),300)" style="color:var(--green-mid);font-weight:600">Regístrate gratis</a>
         </div>
         <div id="forgotMsg" style="display:none;margin-top:.75rem;font-size:.82rem;color:var(--green-mid);background:var(--green-pale);border-radius:8px;padding:.5rem .75rem">
           <i class="bi bi-check-circle me-1"></i><span id="forgotMsgText"></span>
