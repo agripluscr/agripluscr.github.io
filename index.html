@@ -1804,6 +1804,10 @@ window._fb = { auth, db, collection, addDoc, getDocs, doc, updateDoc, deleteDoc,
 //  AUTH STATE LISTENER
 // ══════════════════════════════════════
 onAuthStateChanged(auth, async (user) => {
+  // Si el usuario acaba de entrar con Google y aún no completó el modal de configuración,
+  // ignorar este trigger hasta que confirme nombre y tipo.
+  if (user && window._awaitingGoogleSetup) return;
+
   currentUser = user;
   if (user) {
     // Cargar datos del perfil desde Firestore por UID directo
@@ -2236,6 +2240,8 @@ window.togglePassVis = function(inputId, btn) {
 window.doGoogleLogin = async function() {
   const provider = new GoogleAuthProvider();
   try {
+    // Activar bandera ANTES del popup para bloquear onAuthStateChanged si es usuario nuevo
+    window._awaitingGoogleSetup = true;
     const result = await signInWithPopup(auth, provider);
     const user = result.user;
     const userRef = doc(db, "usuarios", user.uid);
@@ -2245,7 +2251,7 @@ window.doGoogleLogin = async function() {
     bootstrap.Modal.getInstance(document.getElementById("loginModal"))?.hide();
 
     if (!snap.exists()) {
-      // Usuario nuevo → preguntar tipo de cuenta
+      // Usuario nuevo → mostrar modal de configuración (bandera sigue activa)
       window._pendingGoogleUser = user;
       // Resetear formulario
       document.getElementById("googleNameInput").value = "";
@@ -2260,12 +2266,16 @@ window.doGoogleLogin = async function() {
       const confirmBtn = document.getElementById("confirmGoogleTypeBtn");
       confirmBtn.disabled = true;
       confirmBtn.style.opacity = ".5";
+      confirmBtn.innerHTML = '<i class="bi bi-arrow-right me-2"></i>Continuar';
       window._selectedGoogleType = null;
       new bootstrap.Modal(document.getElementById("googleAccountTypeModal")).show();
     } else {
+      // Usuario existente → desactivar bandera y dejar que onAuthStateChanged actúe normalmente
+      window._awaitingGoogleSetup = false;
       showToast("✅ ¡Bienvenido de nuevo!");
     }
   } catch(e) {
+    window._awaitingGoogleSetup = false;
     if (e.code !== "auth/popup-closed-by-user") {
       showToast("❌ No se pudo iniciar sesión con Google. Verificá que Google esté habilitado en Firebase.");
     }
@@ -2323,8 +2333,33 @@ window.confirmGoogleAccountType = async function() {
     bootstrap.Modal.getInstance(document.getElementById("googleAccountTypeModal"))?.hide();
     window._pendingGoogleUser = null;
     window._selectedGoogleType = null;
+    // Desactivar bandera y re-disparar el flujo de sesión manualmente con los datos recién guardados
+    window._awaitingGoogleSetup = false;
+    currentUserData = { uid: user.uid, nombre, email: user.email, telefono: "", tipo };
+    currentUser = user;
+    // Actualizar UI igual que onAuthStateChanged
+    const rolNames2 = { cliente: "Cliente", agricultor: "Agricultor 🌾", empresa: "Empresa", admin: "Admin 🛡️" };
+    document.getElementById("loginBtnText").textContent = nombre.split(" ")[0] + " ▾";
+    document.getElementById("loginToggleBtn").classList.add("logged");
+    document.getElementById("misPedidosBtn").style.display = "flex";
+    document.getElementById("chatNavBtn").style.display = "flex";
+    document.getElementById("registro").style.display = "none";
+    document.getElementById("ctaBanner").style.display = "none";
+    document.getElementById("navRegistroLink").style.display = "none";
+    document.getElementById("perfilBar").style.display = "block";
+    document.getElementById("perfilBarNombre").textContent = nombre;
+    document.getElementById("perfilBarRol").textContent = rolNames2[tipo] || tipo;
+    document.getElementById("perfilBarAvatar").textContent = nombre.charAt(0).toUpperCase();
+    if (tipo === "agricultor") {
+      document.getElementById("adminSection").style.display = "block";
+      document.getElementById("adminPanel").style.display = "block";
+      document.getElementById("agricultor").style.display = "block";
+      document.getElementById("navAgricultorLink").style.display = "block";
+      document.getElementById("farmerPanelLocked").style.display = "none";
+      document.getElementById("farmerPanelUnlocked").style.display = "block";
+    }
     const rolNames = { cliente: "Cliente 🛒", agricultor: "Agricultor 🌾", empresa: "Empresa 🏢" };
-    showToast(`✅ ¡Cuenta creada como ${rolNames[tipo]}!`);
+    showToast(`✅ ¡Bienvenido, ${nombre.split(" ")[0]}! Cuenta creada como ${rolNames[tipo]}`);
   } catch(e) {
     showToast("❌ Error al guardar el tipo de cuenta. Intentá de nuevo.");
     confirmBtn.disabled = false;
