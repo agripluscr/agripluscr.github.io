@@ -1102,6 +1102,84 @@ footer a:hover { color: var(--green-light); }
   </div>
 </div>
 
+<!-- ═══════════════ MODAL: TIPO DE CUENTA GOOGLE ═══════════════ -->
+<div class="modal fade" id="googleAccountTypeModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+  <div class="modal-dialog modal-dialog-centered" style="max-width:440px">
+    <div class="modal-content" style="border-radius:20px;overflow:hidden;border:none">
+      <div class="modal-body p-4">
+        <!-- Header -->
+        <div style="text-align:center;margin-bottom:1.75rem">
+          <div style="width:60px;height:60px;background:linear-gradient(135deg,var(--green-mid),var(--green-light));border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem">
+            <i class="bi bi-person-circle" style="font-size:1.6rem;color:white"></i>
+          </div>
+          <div style="font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;color:var(--charcoal);margin-bottom:.3rem">¡Bienvenido a AgriPlusCR!</div>
+          <div style="font-size:.85rem;color:var(--muted);line-height:1.5">Completá tu perfil para comenzar.</div>
+        </div>
+
+        <!-- Campo nombre -->
+        <div class="mb-3">
+          <label class="form-label" style="font-weight:600;font-size:.88rem">¿Cómo te llamás?</label>
+          <input type="text" class="form-control" id="googleNameInput" placeholder="Tu nombre completo" style="border-radius:12px">
+          <div id="googleNameError" style="display:none;font-size:.78rem;color:#dc2626;margin-top:.3rem"><i class="bi bi-exclamation-circle me-1"></i>Ingresá tu nombre para continuar.</div>
+        </div>
+
+        <!-- Opciones de tipo -->
+        <div style="display:flex;flex-direction:column;gap:.75rem;margin-bottom:1.5rem">
+          <!-- Cliente -->
+          <button onclick="selectGoogleAccountType('cliente')" id="gTypeBtn_cliente"
+            style="width:100%;border:2px solid var(--border);background:white;border-radius:14px;padding:1rem 1.25rem;cursor:pointer;display:flex;align-items:center;gap:1rem;transition:all .2s;text-align:left"
+            onmouseover="this.style.borderColor='var(--green-mid)';this.style.background='var(--green-pale)'"
+            onmouseout="if(!this.classList.contains('g-type-selected')){this.style.borderColor='var(--border)';this.style.background='white'}">
+            <div style="width:44px;height:44px;background:#e0f7ea;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.3rem">🛒</div>
+            <div>
+              <div style="font-weight:700;color:var(--charcoal);font-size:.95rem">Cliente</div>
+              <div style="font-size:.78rem;color:var(--muted);margin-top:2px">Compro productos frescos del campo</div>
+            </div>
+            <i class="bi bi-check-circle-fill ms-auto" id="gCheck_cliente" style="color:var(--green-mid);font-size:1.2rem;display:none"></i>
+          </button>
+
+          <!-- Agricultor -->
+          <button onclick="selectGoogleAccountType('agricultor')" id="gTypeBtn_agricultor"
+            style="width:100%;border:2px solid var(--border);background:white;border-radius:14px;padding:1rem 1.25rem;cursor:pointer;display:flex;align-items:center;gap:1rem;transition:all .2s;text-align:left"
+            onmouseover="this.style.borderColor='var(--green-mid)';this.style.background='var(--green-pale)'"
+            onmouseout="if(!this.classList.contains('g-type-selected')){this.style.borderColor='var(--border)';this.style.background='white'}">
+            <div style="width:44px;height:44px;background:#fef3e2;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.3rem">🌾</div>
+            <div>
+              <div style="font-weight:700;color:var(--charcoal);font-size:.95rem">Agricultor</div>
+              <div style="font-size:.78rem;color:var(--muted);margin-top:2px">Publico y vendo mis productos agrícolas</div>
+            </div>
+            <i class="bi bi-check-circle-fill ms-auto" id="gCheck_agricultor" style="color:var(--green-mid);font-size:1.2rem;display:none"></i>
+          </button>
+
+          <!-- Empresa -->
+          <button onclick="selectGoogleAccountType('empresa')" id="gTypeBtn_empresa"
+            style="width:100%;border:2px solid var(--border);background:white;border-radius:14px;padding:1rem 1.25rem;cursor:pointer;display:flex;align-items:center;gap:1rem;transition:all .2s;text-align:left"
+            onmouseover="this.style.borderColor='var(--green-mid)';this.style.background='var(--green-pale)'"
+            onmouseout="if(!this.classList.contains('g-type-selected')){this.style.borderColor='var(--border)';this.style.background='white'}">
+            <div style="width:44px;height:44px;background:#e0f2fe;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.3rem">🏢</div>
+            <div>
+              <div style="font-weight:700;color:var(--charcoal);font-size:.95rem">Empresa</div>
+              <div style="font-size:.78rem;color:var(--muted);margin-top:2px">Represento una empresa del sector agrícola</div>
+            </div>
+            <i class="bi bi-check-circle-fill ms-auto" id="gCheck_empresa" style="color:var(--green-mid);font-size:1.2rem;display:none"></i>
+          </button>
+        </div>
+
+        <!-- Botón confirmar -->
+        <button id="confirmGoogleTypeBtn" onclick="confirmGoogleAccountType()" disabled
+          style="width:100%;background:var(--green-mid);color:white;border:none;border-radius:12px;padding:.9rem;font-weight:700;font-size:.95rem;cursor:pointer;transition:all .2s;opacity:.5"
+          onmouseover="if(!this.disabled)this.style.background='var(--green-dark)'"
+          onmouseout="this.style.background='var(--green-mid)'">
+          <i class="bi bi-arrow-right me-2"></i>Continuar
+        </button>
+        <div style="font-size:.75rem;color:var(--muted);text-align:center;margin-top:.75rem">
+          <i class="bi bi-shield-check me-1"></i>Podés cambiar esto más adelante desde tu perfil
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ═══════════════ LOGIN MODAL ═══════════════ -->
 <div class="modal fade" id="loginModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered" style="max-width:420px">
@@ -2160,25 +2238,97 @@ window.doGoogleLogin = async function() {
   try {
     const result = await signInWithPopup(auth, provider);
     const user = result.user;
-    // Si es usuario nuevo, crear documento en Firestore
     const userRef = doc(db, "usuarios", user.uid);
     const snap = await getDoc(userRef);
-    if (!snap.exists()) {
-      await setDoc(userRef, {
-        uid: user.uid,
-        nombre: user.displayName || user.email,
-        email: user.email,
-        telefono: user.phoneNumber || "",
-        tipo: "cliente",
-        createdAt: serverTimestamp()
-      });
-    }
+
+    // Cerrar modal de login si está abierto
     bootstrap.Modal.getInstance(document.getElementById("loginModal"))?.hide();
-    showToast("✅ ¡Sesión iniciada con Google!");
+
+    if (!snap.exists()) {
+      // Usuario nuevo → preguntar tipo de cuenta
+      window._pendingGoogleUser = user;
+      // Resetear formulario
+      document.getElementById("googleNameInput").value = "";
+      document.getElementById("googleNameError").style.display = "none";
+      // Resetear selección
+      ["cliente","agricultor","empresa"].forEach(t => {
+        document.getElementById("gTypeBtn_" + t).classList.remove("g-type-selected");
+        document.getElementById("gTypeBtn_" + t).style.borderColor = "var(--border)";
+        document.getElementById("gTypeBtn_" + t).style.background = "white";
+        document.getElementById("gCheck_" + t).style.display = "none";
+      });
+      const confirmBtn = document.getElementById("confirmGoogleTypeBtn");
+      confirmBtn.disabled = true;
+      confirmBtn.style.opacity = ".5";
+      window._selectedGoogleType = null;
+      new bootstrap.Modal(document.getElementById("googleAccountTypeModal")).show();
+    } else {
+      showToast("✅ ¡Bienvenido de nuevo!");
+    }
   } catch(e) {
     if (e.code !== "auth/popup-closed-by-user") {
       showToast("❌ No se pudo iniciar sesión con Google. Verificá que Google esté habilitado en Firebase.");
     }
+  }
+};
+
+window.selectGoogleAccountType = function(tipo) {
+  window._selectedGoogleType = tipo;
+  ["cliente","agricultor","empresa"].forEach(t => {
+    const btn = document.getElementById("gTypeBtn_" + t);
+    const chk = document.getElementById("gCheck_" + t);
+    if (t === tipo) {
+      btn.classList.add("g-type-selected");
+      btn.style.borderColor = "var(--green-mid)";
+      btn.style.background = "var(--green-pale)";
+      chk.style.display = "block";
+    } else {
+      btn.classList.remove("g-type-selected");
+      btn.style.borderColor = "var(--border)";
+      btn.style.background = "white";
+      chk.style.display = "none";
+    }
+  });
+  const confirmBtn = document.getElementById("confirmGoogleTypeBtn");
+  confirmBtn.disabled = false;
+  confirmBtn.style.opacity = "1";
+};
+
+window.confirmGoogleAccountType = async function() {
+  const tipo = window._selectedGoogleType;
+  const user = window._pendingGoogleUser;
+  if (!tipo || !user) return;
+
+  const nombre = document.getElementById("googleNameInput").value.trim();
+  if (!nombre) {
+    document.getElementById("googleNameError").style.display = "block";
+    return;
+  }
+  document.getElementById("googleNameError").style.display = "none";
+
+  const confirmBtn = document.getElementById("confirmGoogleTypeBtn");
+  confirmBtn.disabled = true;
+  confirmBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Guardando...';
+
+  try {
+    const userRef = doc(db, "usuarios", user.uid);
+    await setDoc(userRef, {
+      uid: user.uid,
+      nombre: nombre,
+      email: user.email,
+      telefono: "",
+      tipo: tipo,
+      createdAt: serverTimestamp()
+    });
+    bootstrap.Modal.getInstance(document.getElementById("googleAccountTypeModal"))?.hide();
+    window._pendingGoogleUser = null;
+    window._selectedGoogleType = null;
+    const rolNames = { cliente: "Cliente 🛒", agricultor: "Agricultor 🌾", empresa: "Empresa 🏢" };
+    showToast(`✅ ¡Cuenta creada como ${rolNames[tipo]}!`);
+  } catch(e) {
+    showToast("❌ Error al guardar el tipo de cuenta. Intentá de nuevo.");
+    confirmBtn.disabled = false;
+    confirmBtn.innerHTML = '<i class="bi bi-arrow-right me-2"></i>Continuar';
   }
 };
 
