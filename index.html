@@ -456,7 +456,88 @@ footer a:hover { color: var(--green-light); }
 }
 .login-toggle-btn:hover { border-color: var(--green-light); color: var(--green-mid); }
 .login-toggle-btn.logged { background: var(--green-pale); border-color: var(--green-light); color: var(--green-dark); }
+
+/* ── CHAT ── */
+.chat-conv-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: .75rem 1rem; border-radius: 14px;
+  cursor: pointer; transition: all .2s;
+  border: 1.5px solid var(--border);
+  margin-bottom: .5rem; background: white;
+}
+.chat-conv-item:hover { border-color: var(--green-light); background: var(--cream); }
+.chat-conv-item.unread { border-color: var(--green-light); background: var(--green-pale); }
+.chat-conv-avatar {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--green-mid), var(--amber));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem; font-weight: 700; color: white; flex-shrink: 0;
+}
+.msg-bubble {
+  max-width: 72%; padding: .6rem .95rem;
+  border-radius: 18px; font-size: .875rem;
+  line-height: 1.5; word-break: break-word;
+}
+.msg-bubble.mine {
+  background: var(--green-mid); color: white;
+  border-bottom-right-radius: 4px; align-self: flex-end;
+}
+.msg-bubble.theirs {
+  background: white; color: var(--charcoal);
+  border: 1px solid var(--border);
+  border-bottom-left-radius: 4px; align-self: flex-start;
+}
+.msg-time {
+  font-size: .68rem; opacity: .65;
+  display: block; margin-top: 3px;
+  text-align: right;
+}
+.msg-time.theirs { text-align: left; }
+
+/* ── SISTEMA DE ENTREGAS / GPS ── */
+.delivery-map { height: 280px; border-radius: 14px; overflow: hidden; border: 1.5px solid var(--border); }
+.delivery-status-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 12px; border-radius: 20px;
+  font-size: .78rem; font-weight: 600;
+}
+.delivery-status-badge.pendiente   { background: var(--amber-light);  color: #92400e; }
+.delivery-status-badge.en-camino   { background: #e0f2fe; color: #0c4a6e; }
+.delivery-status-badge.entregado   { background: var(--green-pale); color: var(--green-dark); }
+.delivery-status-badge.cancelado   { background: #fee2e2; color: #991b1b; }
+
+.location-pick-btn {
+  background: var(--green-pale); color: var(--green-dark);
+  border: 1.5px solid var(--green-light); border-radius: 12px;
+  padding: .55rem 1rem; font-size: .85rem; font-weight: 600;
+  cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+  transition: all .2s;
+}
+.location-pick-btn:hover { background: var(--green-mid); color: white; }
+
+.gps-pulse {
+  width: 14px; height: 14px; border-radius: 50%;
+  background: var(--green-light); display: inline-block;
+  animation: gpsPulse 1.5s infinite;
+}
+@keyframes gpsPulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(82,183,136,.6); }
+  50%      { box-shadow: 0 0 0 8px rgba(82,183,136,0); }
+}
+
+.entrega-card {
+  border: 1.5px solid var(--border); border-radius: 16px;
+  padding: 1rem 1.25rem; margin-bottom: .75rem;
+  transition: border-color .2s;
+}
+.entrega-card:hover { border-color: var(--green-light); }
+.entrega-card .ec-header {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  flex-wrap: wrap; gap: .5rem;
+}
 </style>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 <body>
 
@@ -483,9 +564,7 @@ footer a:hover { color: var(--green-light); }
 <nav class="navbar navbar-expand-lg">
   <div class="container">
     <a class="navbar-brand" href="#inicio">
-      <svg class="brand-logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-        <use href="#agriplus-logo"/>
-      </svg>
+<img src="data:image/jpeg;base64,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" alt="AgriPlusCR" class="brand-logo-svg" style="border-radius:8px;object-fit:contain;">
       AgriPlusCR
     </a>
     <button class="navbar-toggler border-0" data-bs-toggle="collapse" data-bs-target="#navContent">
@@ -507,6 +586,11 @@ footer a:hover { color: var(--green-light); }
           <i class="bi bi-bag-check"></i>
           <span>Mis pedidos</span>
         </button>
+        <button class="login-toggle-btn" id="chatNavBtn" style="display:none;position:relative" onclick="openChatModal()">
+          <i class="bi bi-chat-dots"></i>
+          <span>Mensajes</span>
+          <span id="chatUnreadBadge" style="display:none;position:absolute;top:-4px;right:-4px;background:var(--amber);color:white;border-radius:50%;width:16px;height:16px;font-size:9px;font-weight:700;align-items:center;justify-content:center">0</span>
+        </button>
         <button class="btn-cart nav-link" data-bs-toggle="offcanvas" data-bs-target="#cartSidebar">
           <i class="bi bi-bag"></i> Carrito
           <span class="cart-badge" id="cartCount">0</span>
@@ -527,6 +611,10 @@ footer a:hover { color: var(--green-light); }
       </div>
     </div>
     <div class="d-flex align-items-center gap-2">
+      <button onclick="openChatModal()" style="background:rgba(255,255,255,.1);border:none;border-radius:8px;padding:4px 12px;font-size:.78rem;color:white;cursor:pointer;display:flex;align-items:center;gap:5px;position:relative">
+        <i class="bi bi-chat-dots-fill"></i> Mensajes
+        <span id="chatUnreadBadge2" style="display:none;position:absolute;top:-3px;right:-3px;background:var(--amber);color:white;border-radius:50%;width:14px;height:14px;font-size:8px;font-weight:700;align-items:center;justify-content:center">0</span>
+      </button>
       <button onclick="openPerfilModal()" style="background:rgba(255,255,255,.1);border:none;border-radius:8px;padding:4px 12px;font-size:.78rem;color:white;cursor:pointer;display:flex;align-items:center;gap:5px">
         <i class="bi bi-person-gear"></i> Configuración
       </button>
@@ -679,6 +767,20 @@ footer a:hover { color: var(--green-light); }
                 <div class="panel-action-icon"><i class="bi bi-shop-window"></i></div>
                 <div style="font-size:.82rem;font-weight:600">Tiendas</div>
                 <div style="font-size:.72rem;opacity:.6">Insumos & Tech</div>
+              </a>
+            </div>
+            <div class="col-6 col-md-3">
+              <a href="javascript:void(0)" onclick="openChatModal()" class="panel-action-card">
+                <div class="panel-action-icon"><i class="bi bi-chat-dots-fill"></i></div>
+                <div style="font-size:.82rem;font-weight:600">Mensajes</div>
+                <div style="font-size:.72rem;opacity:.6">Chat directo</div>
+              </a>
+            </div>
+            <div class="col-6 col-md-3">
+              <a href="javascript:void(0)" onclick="openEntregasModal()" class="panel-action-card">
+                <div class="panel-action-icon"><i class="bi bi-truck"></i></div>
+                <div style="font-size:.82rem;font-weight:600">Entregas</div>
+                <div style="font-size:.72rem;opacity:.6">GPS en tiempo real</div>
               </a>
             </div>
           </div>
@@ -1045,6 +1147,75 @@ footer a:hover { color: var(--green-light); }
   </div>
 </div>
 
+<!-- ═══════════════ MODAL: ELEGIR UBICACIÓN CLIENTE ═══════════════ -->
+<div class="modal fade" id="locationPickerModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-geo-alt-fill me-2" style="color:var(--green-mid)"></i>¿Dónde te entregamos?</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+        <p style="color:var(--muted);font-size:.88rem;margin-bottom:1rem">Marcá tu ubicación exacta en el mapa o usá tu GPS para que el agricultor sepa dónde llevar tu pedido.</p>
+        <div class="d-flex gap-2 mb-3 flex-wrap">
+          <button class="location-pick-btn" onclick="pickClientGPS()">
+            <i class="bi bi-crosshair2"></i> Usar mi ubicación GPS
+          </button>
+          <div style="flex:1;min-width:180px">
+            <input type="text" id="clientAddressInput" class="form-control" placeholder="O escribí tu dirección…" oninput="geocodeClientAddress()" style="border-radius:12px">
+          </div>
+        </div>
+        <div id="locationPickerMap" class="delivery-map mb-3"></div>
+        <div id="clientLocationStatus" style="font-size:.82rem;color:var(--muted);margin-bottom:.75rem;min-height:1.2rem"></div>
+        <input type="hidden" id="clientLat">
+        <input type="hidden" id="clientLng">
+        <input type="hidden" id="clientAddress">
+      </div>
+      <div class="modal-footer border-top-0 pt-0 px-4 pb-4">
+        <button class="btn" style="border-radius:10px;border:1.5px solid var(--border);color:var(--muted);font-size:.88rem" data-bs-dismiss="modal">Cancelar</button>
+        <button class="btn" id="confirmLocationBtn" style="background:var(--green-mid);color:white;border-radius:10px;font-weight:600;font-size:.88rem;padding:.55rem 1.5rem" onclick="confirmClientLocation()" disabled>
+          <i class="bi bi-check-lg me-1"></i> Confirmar ubicación y pedir
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ MODAL: GESTIÓN DE ENTREGAS (agricultor) ═══════════════ -->
+<div class="modal fade" id="entregasModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-truck me-2" style="color:var(--green-mid)"></i>Gestión de Entregas</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-3" id="entregasBody">
+        <div class="text-center py-4 text-muted"><div class="spinner-border spinner-border-sm me-2"></div>Cargando entregas...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ MODAL: TRACKING DEL CLIENTE ═══════════════ -->
+<div class="modal fade" id="trackingModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="trackingModalTitle"><i class="bi bi-broadcast me-2" style="color:var(--green-mid)"></i>Seguimiento de Entrega</h5>
+        <button class="btn-close" data-bs-dismiss="modal" onclick="stopTrackingWatch()"></button>
+      </div>
+      <div class="modal-body p-4">
+        <div id="trackingStatusRow" class="d-flex align-items-center gap-3 mb-3 flex-wrap">
+          <span id="trackingStatusBadge" class="delivery-status-badge pendiente">⏳ Pendiente</span>
+          <span id="trackingFarmerGpsInfo" style="font-size:.8rem;color:var(--muted)"></span>
+        </div>
+        <div id="trackingMapContainer" class="delivery-map mb-3"></div>
+        <div id="trackingInfoRow" style="font-size:.82rem;color:var(--muted);line-height:1.6"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ═══════════════ PERFIL USUARIO ═══════════════ -->
 <div class="modal fade" id="perfilModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered" style="max-width:440px">
@@ -1262,6 +1433,60 @@ footer a:hover { color: var(--green-light); }
   </div>
 </div>
 
+<!-- ═══════════════ CHAT MODAL ═══════════════ -->
+<div class="modal fade" id="chatModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered" style="max-width:700px;margin:1rem auto">
+    <div class="modal-content" style="height:82vh;display:flex;flex-direction:column;overflow:hidden">
+      <!-- Header -->
+      <div class="modal-header" style="padding:1rem 1.25rem;flex-shrink:0">
+        <div class="d-flex align-items-center gap-2 w-100">
+          <button id="chatBackBtn" onclick="chatShowList()" style="display:none;background:none;border:none;padding:4px 8px;cursor:pointer;color:var(--green-mid);font-size:1.1rem;border-radius:8px;flex-shrink:0" title="Volver">
+            <i class="bi bi-arrow-left"></i>
+          </button>
+          <h5 class="modal-title" style="flex:1;font-family:'Playfair Display',serif;font-size:1.1rem" id="chatModalTitle">
+            <i class="bi bi-chat-dots-fill me-2" style="color:var(--green-mid)"></i>Mensajes
+          </h5>
+          <button class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+      </div>
+
+      <!-- PANEL: Lista de conversaciones -->
+      <div id="chatListPanel" style="flex:1;overflow-y:auto;padding:1rem">
+        <div id="chatListEmpty" class="text-center py-5" style="display:none">
+          <div style="font-size:3rem;margin-bottom:.75rem">💬</div>
+          <p style="color:var(--muted);font-size:.9rem">Aún no tenés conversaciones.<br>Buscá un producto y tocá <i class="bi bi-chat-dots"></i> para iniciar.</p>
+        </div>
+        <div id="chatListLoading" class="text-center py-4 text-muted">
+          <div class="spinner-border spinner-border-sm me-2"></div>Cargando...
+        </div>
+        <div id="chatListItems"></div>
+      </div>
+
+      <!-- PANEL: Conversación activa -->
+      <div id="chatConvPanel" style="display:none;flex:1;overflow:hidden;display:none;flex-direction:column">
+        <!-- Info del interlocutor -->
+        <div id="chatConvHeader" style="padding:.6rem 1.25rem;background:var(--cream);border-bottom:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;gap:10px">
+          <div id="chatOtherAvatar" style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--green-mid),var(--amber));display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:700;color:white;flex-shrink:0">?</div>
+          <div>
+            <div id="chatOtherName" style="font-weight:600;font-size:.9rem;color:var(--charcoal)">—</div>
+            <div id="chatOtherRole" style="font-size:.72rem;color:var(--muted)">—</div>
+          </div>
+        </div>
+        <!-- Mensajes -->
+        <div id="chatMessages" style="flex:1;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:.6rem;background:var(--cream)"></div>
+        <!-- Input -->
+        <div style="padding:.75rem 1rem;border-top:1px solid var(--border);background:white;flex-shrink:0;display:flex;gap:8px;align-items:flex-end">
+          <textarea id="chatInput" rows="1" placeholder="Escribí tu mensaje..." style="flex:1;border:1.5px solid var(--border);border-radius:12px;padding:.55rem .9rem;font-size:.88rem;font-family:'DM Sans',sans-serif;resize:none;outline:none;max-height:100px;transition:border-color .2s" onfocus="this.style.borderColor='var(--green-light)'" onblur="this.style.borderColor='var(--border)'" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();chatSendMessage()}"></textarea>
+          <button onclick="chatSendMessage()" style="background:var(--green-mid);color:white;border:none;border-radius:12px;padding:.55rem .9rem;cursor:pointer;font-size:1.05rem;transition:all .2s;flex-shrink:0" onmouseover="this.style.background='var(--green-dark)'" onmouseout="this.style.background='var(--green-mid)'">
+            <i class="bi bi-send-fill"></i>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div class="toast-custom" id="toastEl"></div>
 
@@ -1270,7 +1495,7 @@ footer a:hover { color: var(--green-light); }
 <!-- Firebase SDKs -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail, sendEmailVerification } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, collection, addDoc, setDoc, getDocs, doc, getDoc, updateDoc, deleteDoc, query, where, orderBy, serverTimestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -1319,6 +1544,8 @@ onAuthStateChanged(auth, async (user) => {
     document.getElementById("loginBtnText").textContent = name.split(" ")[0] + " ▾";
     document.getElementById("loginToggleBtn").classList.add("logged");
     document.getElementById("misPedidosBtn").style.display = "flex";
+    document.getElementById("chatNavBtn").style.display = "flex";
+    chatLoadConvs();
 
     if (role === "agricultor" || role === "admin") {
       document.getElementById("adminSection").style.display = "block";
@@ -1356,8 +1583,11 @@ onAuthStateChanged(auth, async (user) => {
     document.getElementById("loginBtnText").textContent = "Iniciar sesión";
     document.getElementById("loginToggleBtn").classList.remove("logged");
     document.getElementById("misPedidosBtn").style.display = "none";
+    document.getElementById("chatNavBtn").style.display = "none";
     document.getElementById("adminSection").style.display = "none";
     document.getElementById("perfilBar").style.display = "none";
+    updateChatBadge(0);
+    if (typeof chatUnsubscribeConvs !== "undefined" && chatUnsubscribeConvs) { chatUnsubscribeConvs(); chatUnsubscribeConvs = null; }
   }
   loadAllProducts();
 });
@@ -1418,9 +1648,14 @@ function renderProducts() {
           <div class="product-price">₡${p.price.toLocaleString()} <small>/ ${p.unit}</small></div>
         </div>
         <div class="product-footer">
-          <button class="btn-add" onclick="addToCart('${p.firestoreId}')">
-            <i class="bi bi-bag-plus"></i> Agregar
-          </button>
+          <div class="d-flex gap-1">
+            <button class="btn-add" style="flex:1" onclick="addToCart('${p.firestoreId}')">
+              <i class="bi bi-bag-plus"></i> Agregar
+            </button>
+            ${p.uid && p.uid !== 'demo' ? `<button class="btn-add" style="flex:0 0 auto;padding:.6rem .75rem;background:var(--amber-light);color:#92400e" onclick="iniciarChat('${p.uid}','${p.ownerName || p.origin}')" title="Contactar agricultor">
+              <i class="bi bi-chat-dots"></i>
+            </button>` : ''}
+          </div>
         </div>
       </div>
     </div>`).join("");
@@ -1669,11 +1904,11 @@ window.doLogin = async function() {
   }
 };
 
-async function doLogout() {
+window.doLogout = async function() {
   await signOut(auth);
   document.getElementById("adminSection").style.display = "none";
   showToast("👋 Sesión cerrada");
-}
+};
 
 // ══════════════════════════════════════
 //  ELIMINAR CUENTA
@@ -1731,7 +1966,8 @@ window.doRegister = async function() {
       nombre, telefono, email, tipo,
       createdAt: serverTimestamp()
     });
-    showToast("✅ ¡Cuenta creada exitosamente!");
+    await sendEmailVerification(cred.user);
+    showToast("✅ ¡Cuenta creada! Revisá tu correo para verificarla.");
     // Limpiar formulario
     ["regNombre","regTelefono","regEmail","regPass"].forEach(id => document.getElementById(id).value = "");
     document.getElementById("terms").checked = false;
@@ -1807,30 +2043,18 @@ window.handleImageSelect = async function(input) {
 };
 
 // ══════════════════════════════════════
-//  CONFIRMAR PEDIDO — FIRESTORE
+//  CONFIRMAR PEDIDO — pide ubicación primero
 // ══════════════════════════════════════
 window.confirmOrder = async function() {
   if (!cart.length) return;
-  const total = cart.reduce((s, c) => s + c.price * c.qty, 0);
-  const pedido = {
-    items: cart.map(c => ({ id: c.firestoreId, name: c.name, emoji: c.emoji, price: c.price, qty: c.qty, unit: c.unit })),
-    total,
-    uid: currentUser?.uid || "anonimo",
-    clienteNombre: currentUserData?.nombre || "Visitante",
-    clienteEmail: currentUser?.email || "",
-    estado: "pendiente",
-    createdAt: serverTimestamp()
-  };
-  try {
-    await addDoc(collection(db, "pedidos"), pedido);
-    showToast("🎉 ¡Pedido confirmado! Te contactaremos pronto.");
-    cart = [];
-    renderCart();
-    const offcanvas = bootstrap.Offcanvas.getInstance(document.getElementById("cartSidebar"));
-    if (offcanvas) offcanvas.hide();
-  } catch(e) {
-    showToast("❌ Error al confirmar pedido. Intentá de nuevo.");
+  if (!currentUser) {
+    showToast("🔒 Debés iniciar sesión para hacer un pedido");
+    new bootstrap.Modal(document.getElementById("loginModal")).show();
+    return;
   }
+  // Abrir selector de ubicación antes de confirmar
+  window._pendingOrderCart = cart.slice();
+  openLocationPicker();
 };
 
 // ══════════════════════════════════════
@@ -2079,16 +2303,20 @@ window.openMisPedidos = async function() {
       const est = estadoColors[p.estado] || estadoColors.pendiente;
       const fecha = p.createdAt?.seconds ? new Date(p.createdAt.seconds * 1000).toLocaleDateString("es-CR") : "—";
       const items = (p.items || []).map(i => `${i.emoji || ""} ${i.name} ×${i.qty}`).join(", ");
+      const hasLocation = p.clienteLat && p.clienteLng;
+      const hasGPS = p.farmLat && p.farmLng;
       return `
         <div style="border:1px solid var(--border);border-radius:14px;padding:1rem 1.25rem;margin-bottom:.75rem">
           <div class="d-flex justify-content-between align-items-start gap-2 flex-wrap">
             <div>
               <div style="font-weight:600;font-size:.9rem;margin-bottom:4px">${items}</div>
               <div style="font-size:.78rem;color:var(--muted)"><i class="bi bi-calendar3 me-1"></i>${fecha}</div>
+              ${hasLocation ? `<div style="font-size:.75rem;color:var(--green-mid);margin-top:3px"><i class="bi bi-geo-alt-fill me-1"></i>Ubicación de entrega registrada</div>` : ''}
             </div>
             <div style="text-align:right">
               <div style="font-family:'Playfair Display',serif;font-weight:700;color:var(--green-dark);font-size:1.05rem">₡${(p.total||0).toLocaleString()}</div>
               <span style="background:${est.bg};color:${est.color};border-radius:8px;padding:2px 10px;font-size:.75rem;font-weight:600">${est.label}</span>
+              ${(hasLocation || hasGPS) ? `<br><button onclick="openTrackingModal('${p.id}')" style="margin-top:6px;background:var(--green-pale);border:1.5px solid var(--green-light);border-radius:8px;color:var(--green-dark);font-size:.75rem;font-weight:600;padding:3px 10px;cursor:pointer"><i class="bi bi-broadcast me-1"></i>Ver en mapa</button>` : ''}
             </div>
           </div>
         </div>`;
@@ -2126,6 +2354,7 @@ window.openPedidosRecibidos = async function(e) {
       const est = estadoColors[p.estado] || estadoColors.pendiente;
       const fecha = p.createdAt?.seconds ? new Date(p.createdAt.seconds * 1000).toLocaleDateString("es-CR") : "—";
       const items = (p.items || []).map(i => `${i.emoji || ""} ${i.name} ×${i.qty}`).join(", ");
+      const hasClientLoc = p.clienteLat && p.clienteLng;
       return `
         <div style="border:1px solid var(--border);border-radius:14px;padding:1rem 1.25rem;margin-bottom:.75rem">
           <div class="d-flex justify-content-between align-items-start gap-2 flex-wrap">
@@ -2133,14 +2362,23 @@ window.openPedidosRecibidos = async function(e) {
               <div style="font-weight:600;font-size:.88rem;margin-bottom:2px">${p.clienteNombre || "Cliente"} <span style="font-weight:400;color:var(--muted);font-size:.78rem">(${p.clienteEmail || ""})</span></div>
               <div style="font-size:.82rem;color:var(--charcoal);margin-bottom:4px">${items}</div>
               <div style="font-size:.75rem;color:var(--muted)"><i class="bi bi-calendar3 me-1"></i>${fecha}</div>
+              ${hasClientLoc ? `
+              <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+                <span style="font-size:.75rem;color:var(--green-mid);font-weight:600"><i class="bi bi-geo-alt-fill me-1"></i>${p.clienteAddress || 'Ver ubicación cliente'}</span>
+                <a href="https://maps.google.com/?q=${p.clienteLat},${p.clienteLng}" target="_blank" style="font-size:.72rem;background:var(--green-pale);color:var(--green-dark);border-radius:6px;padding:2px 8px;font-weight:600;text-decoration:none"><i class="bi bi-map me-1"></i>Abrir en Maps</a>
+              </div>` : '<div style="font-size:.73rem;color:var(--muted);margin-top:4px"><i class="bi bi-exclamation-circle me-1"></i>Sin ubicación de entrega</div>'}
             </div>
-            <div style="text-align:right;min-width:130px">
+            <div style="text-align:right;min-width:160px">
               <div style="font-family:'Playfair Display',serif;font-weight:700;color:var(--green-dark);font-size:1.05rem;margin-bottom:6px">₡${(p.total||0).toLocaleString()}</div>
-              <select onchange="cambiarEstadoPedido('${p.id}', this.value)" style="border:1.5px solid var(--border);border-radius:8px;padding:3px 8px;font-size:.78rem;font-weight:600;background:${est.bg};color:${est.color};cursor:pointer">
+              <select onchange="cambiarEstadoPedido('${p.id}', this.value)" style="border:1.5px solid var(--border);border-radius:8px;padding:3px 8px;font-size:.78rem;font-weight:600;background:${est.bg};color:${est.color};cursor:pointer;margin-bottom:6px">
                 ${["pendiente","en camino","entregado","cancelado"].map(s =>
                   `<option value="${s}" ${p.estado===s?"selected":""}>${estadoColors[s]?.label||s}</option>`
                 ).join("")}
               </select>
+              <br>
+              <button onclick="compartirGPSAgricultor('${p.id}')" style="background:var(--green-mid);border:none;border-radius:8px;color:white;font-size:.75rem;font-weight:600;padding:4px 10px;cursor:pointer;display:inline-flex;align-items:center;gap:4px">
+                <span class="gps-pulse"></span> Compartir mi GPS
+              </button>
             </div>
           </div>
         </div>`;
@@ -2181,6 +2419,630 @@ window.openEstadisticas = async function(e) {
   } catch(e) {
     showToast("❌ Error al cargar estadísticas");
   }
+};
+
+// ══════════════════════════════════════
+//  CHAT EN TIEMPO REAL
+// ══════════════════════════════════════
+/*
+  ⚠️  REGLAS DE FIRESTORE REQUERIDAS — pegar en Firebase Console > Firestore > Reglas:
+
+  rules_version = '2';
+  service cloud.firestore {
+    match /databases/{database}/documents {
+
+      match /conversaciones/{convId} {
+        allow read, write: if request.auth != null
+          && request.auth.uid in resource.data.participantes;
+        allow create: if request.auth != null
+          && request.auth.uid in request.resource.data.participantes;
+
+        match /mensajes/{msgId} {
+          allow read, write: if request.auth != null;
+        }
+      }
+
+      // Mantener las demás reglas existentes
+      match /{document=**} {
+        allow read, write: if request.auth != null;
+      }
+    }
+  }
+*/
+let chatActiveConvId = null;
+let chatUnsubscribeMessages = null;
+let chatUnsubscribeConvs = null;
+let chatConvsData = [];
+
+// Genera un ID de conversación determinístico entre dos UIDs
+function chatConvId(uid1, uid2) {
+  return [uid1, uid2].sort().join("_");
+}
+
+// Muestra la lista de conversaciones
+function chatShowList() {
+  chatActiveConvId = null;
+  if (chatUnsubscribeMessages) { chatUnsubscribeMessages(); chatUnsubscribeMessages = null; }
+  document.getElementById("chatListPanel").style.display = "block";
+  document.getElementById("chatConvPanel").style.display = "none";
+  document.getElementById("chatConvPanel").style.flexDirection = "";
+  document.getElementById("chatBackBtn").style.display = "none";
+  document.getElementById("chatModalTitle").innerHTML = '<i class="bi bi-chat-dots-fill me-2" style="color:var(--green-mid)"></i>Mensajes';
+}
+
+// Abre el modal de chat en la lista
+window.openChatModal = function() {
+  if (!currentUser) { showToast("🔒 Debés iniciar sesión para ver mensajes"); new bootstrap.Modal(document.getElementById("loginModal")).show(); return; }
+  const modal = new bootstrap.Modal(document.getElementById("chatModal"));
+  modal.show();
+  chatShowList();
+  chatLoadConvs();
+};
+
+// Inicia o abre conversación con un agricultor desde la card de producto
+window.iniciarChat = function(otherUid, otherName) {
+  if (!currentUser) { showToast("🔒 Debés iniciar sesión para enviar mensajes"); new bootstrap.Modal(document.getElementById("loginModal")).show(); return; }
+  if (otherUid === currentUser.uid) { showToast("💬 No podés chatear con vos mismo"); return; }
+  const modal = new bootstrap.Modal(document.getElementById("chatModal"));
+  modal.show();
+  chatShowList();
+  chatLoadConvs();
+  setTimeout(() => chatOpenConv(otherUid, otherName, "Agricultor 🌾"), 300);
+};
+
+// Renderiza la lista de conversaciones
+async function chatRenderConvs(convsList) {
+  document.getElementById("chatListLoading").style.display = "none";
+  chatConvsData = convsList.sort((a, b) => (b.updatedAt?.seconds || 0) - (a.updatedAt?.seconds || 0));
+
+  if (!chatConvsData.length) {
+    document.getElementById("chatListEmpty").style.display = "block";
+    document.getElementById("chatListItems").innerHTML = "";
+    updateChatBadge(0);
+    return;
+  }
+  document.getElementById("chatListEmpty").style.display = "none";
+
+  let totalUnread = 0;
+  const items = chatConvsData.map(conv => {
+    const otherId = conv.participantes.find(p => p !== currentUser.uid);
+    const otherName = conv.nombres?.[otherId] || "Usuario";
+    const otherRole = conv.roles?.[otherId] || "";
+    const lastMsg = conv.ultimoMensaje || "Sin mensajes aún";
+    const lastTime = conv.updatedAt?.seconds
+      ? new Date(conv.updatedAt.seconds * 1000).toLocaleTimeString("es-CR", { hour: "2-digit", minute: "2-digit" })
+      : "";
+    const unread = (conv.noLeidos?.[currentUser.uid] || 0) > 0;
+    if (unread) totalUnread++;
+    const initial = otherName.charAt(0).toUpperCase();
+    const roleLabel = { cliente: "Cliente", agricultor: "Agricultor 🌾", empresa: "Empresa", admin: "Admin" };
+    const safeName = otherName.replace(/\\/g,"\\\\").replace(/'/g,"\\'");
+    const safeRole = otherRole.replace(/'/g,"\\'");
+    return `
+      <div class="chat-conv-item ${unread ? 'unread' : ''}" onclick="chatOpenConv('${otherId}','${safeName}','${safeRole}')">
+        <div class="chat-conv-avatar">${initial}</div>
+        <div style="flex:1;min-width:0">
+          <div class="d-flex justify-content-between align-items-center">
+            <span style="font-weight:${unread?'700':'600'};font-size:.88rem;color:var(--charcoal)">${otherName}</span>
+            <span style="font-size:.7rem;color:var(--muted);white-space:nowrap">${lastTime}</span>
+          </div>
+          <div style="font-size:.75rem;color:var(--muted);margin-top:1px">${roleLabel[otherRole] || otherRole}</div>
+          <div style="font-size:.78rem;color:${unread?'var(--green-dark)':'var(--muted)'};font-weight:${unread?'600':'400'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:90%">${lastMsg}</div>
+        </div>
+        ${unread ? '<span style="width:9px;height:9px;background:var(--green-mid);border-radius:50%;flex-shrink:0;align-self:center"></span>' : ''}
+      </div>`;
+  });
+  document.getElementById("chatListItems").innerHTML = items.join("");
+  updateChatBadge(totalUnread);
+}
+
+// Carga lista de conversaciones — intenta onSnapshot, si falla usa getDocs
+function chatLoadConvs() {
+  if (!currentUser) return;
+  document.getElementById("chatListLoading").style.display = "block";
+  document.getElementById("chatListItems").innerHTML = "";
+  document.getElementById("chatListEmpty").style.display = "none";
+
+  if (chatUnsubscribeConvs) { chatUnsubscribeConvs(); chatUnsubscribeConvs = null; }
+
+  const q = query(
+    collection(db, "conversaciones"),
+    where("participantes", "array-contains", currentUser.uid)
+  );
+
+  // Intentar suscripción en tiempo real
+  try {
+    const unsub = onSnapshot(q,
+      async (snap) => {
+        const convsList = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        await chatRenderConvs(convsList);
+      },
+      async (err) => {
+        // onSnapshot falló (reglas, índice, etc.) — fallback con getDocs
+        console.warn("Chat onSnapshot error, usando getDocs:", err.code, err.message);
+        try {
+          const snap = await getDocs(q);
+          const convsList = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+          await chatRenderConvs(convsList);
+        } catch(err2) {
+          document.getElementById("chatListLoading").style.display = "none";
+          // Si getDocs también falla, mostrar estado vacío con mensaje útil
+          document.getElementById("chatListEmpty").style.display = "block";
+          document.getElementById("chatListItems").innerHTML = `
+            <div class="text-center py-3" style="font-size:.82rem;color:var(--muted)">
+              <i class="bi bi-info-circle me-1"></i>
+              Para activar el chat, configurá las reglas de Firestore.<br>
+              <a href="https://console.firebase.google.com" target="_blank" style="color:var(--green-mid);font-weight:600">Abrir Firebase Console →</a>
+            </div>`;
+          console.error("Chat getDocs error:", err2);
+        }
+      }
+    );
+    chatUnsubscribeConvs = unsub;
+  } catch(e) {
+    document.getElementById("chatListLoading").style.display = "none";
+    document.getElementById("chatListEmpty").style.display = "block";
+    console.error("Chat init error:", e);
+  }
+}
+
+function updateChatBadge(count) {
+  const b1 = document.getElementById("chatUnreadBadge");
+  const b2 = document.getElementById("chatUnreadBadge2");
+  [b1, b2].forEach(b => {
+    if (!b) return;
+    if (count > 0) { b.textContent = count > 9 ? "9+" : count; b.style.display = "flex"; }
+    else { b.style.display = "none"; }
+  });
+}
+
+// Abre una conversación específica
+async function chatOpenConv(otherUid, otherName, otherRole) {
+  if (!currentUser) return;
+  chatActiveConvId = chatConvId(currentUser.uid, otherUid);
+
+  // Mostrar panel conversación
+  document.getElementById("chatListPanel").style.display = "none";
+  const convPanel = document.getElementById("chatConvPanel");
+  convPanel.style.display = "flex";
+  convPanel.style.flexDirection = "column";
+  document.getElementById("chatBackBtn").style.display = "flex";
+  document.getElementById("chatModalTitle").textContent = otherName;
+  document.getElementById("chatOtherName").textContent = otherName;
+  const roleLabel = { cliente: "Cliente", agricultor: "Agricultor 🌾", empresa: "Empresa", admin: "Admin 🛡️" };
+  document.getElementById("chatOtherRole").textContent = roleLabel[otherRole] || otherRole || "Usuario";
+  document.getElementById("chatOtherAvatar").textContent = otherName.charAt(0).toUpperCase();
+
+  const msgsEl = document.getElementById("chatMessages");
+  msgsEl.innerHTML = `<div class="text-center py-3 text-muted" style="font-size:.8rem"><div class="spinner-border spinner-border-sm me-1"></div>Cargando mensajes...</div>`;
+  document.getElementById("chatInput").focus();
+
+  // Asegurar que el documento de conversación exista
+  const convRef = doc(db, "conversaciones", chatActiveConvId);
+  try {
+    const convSnap = await getDoc(convRef);
+    const myName = currentUserData?.nombre || currentUser.email;
+    const myRole = currentUserData?.tipo || "cliente";
+    if (!convSnap.exists()) {
+      await setDoc(convRef, {
+        participantes: [currentUser.uid, otherUid],
+        nombres: { [currentUser.uid]: myName, [otherUid]: otherName },
+        roles: { [currentUser.uid]: myRole, [otherUid]: otherRole },
+        ultimoMensaje: "",
+        updatedAt: serverTimestamp(),
+        noLeidos: { [currentUser.uid]: 0, [otherUid]: 0 }
+      });
+    } else {
+      // Actualizar nombre propio por si cambió
+      await updateDoc(convRef, {
+        [`nombres.${currentUser.uid}`]: myName,
+        [`roles.${currentUser.uid}`]: myRole,
+        [`noLeidos.${currentUser.uid}`]: 0
+      });
+    }
+  } catch(e) { /* puede fallar si reglas de Firestore */ }
+
+  // Suscribir mensajes en tiempo real
+  if (chatUnsubscribeMessages) chatUnsubscribeMessages();
+
+  const msgsQuery = query(
+    collection(db, "conversaciones", chatActiveConvId, "mensajes"),
+    orderBy("createdAt", "asc")
+  );
+
+  function chatRenderMessages(snap) {
+    if (snap.empty) {
+      msgsEl.innerHTML = `<div class="text-center py-4 text-muted" style="font-size:.82rem">Iniciá la conversación 👋</div>`;
+      return;
+    }
+    const msgs = snap.docs.map(d => d.data());
+    msgsEl.innerHTML = msgs.map(m => {
+      const mine = m.senderUid === currentUser.uid;
+      const time = m.createdAt?.seconds
+        ? new Date(m.createdAt.seconds * 1000).toLocaleTimeString("es-CR", { hour: "2-digit", minute: "2-digit" })
+        : "";
+      return `
+        <div style="display:flex;flex-direction:column;align-items:${mine?'flex-end':'flex-start'}">
+          <div class="msg-bubble ${mine?'mine':'theirs'}">${escapeHtml(m.texto)}</div>
+          <span class="msg-time ${mine?'':'theirs'}">${time}</span>
+        </div>`;
+    }).join("");
+    setTimeout(() => msgsEl.scrollTop = msgsEl.scrollHeight, 50);
+  }
+
+  try {
+    chatUnsubscribeMessages = onSnapshot(
+      msgsQuery,
+      (snap) => chatRenderMessages(snap),
+      async (err) => {
+        // Fallback sin orderBy (puede requerir índice compuesto)
+        console.warn("Mensajes onSnapshot error, intentando sin orderBy:", err.code);
+        try {
+          const snap = await getDocs(collection(db, "conversaciones", chatActiveConvId, "mensajes"));
+          chatRenderMessages(snap);
+        } catch(err2) {
+          msgsEl.innerHTML = `<div class="text-center py-4 text-muted" style="font-size:.8rem"><i class="bi bi-exclamation-circle me-1"></i>No se pudieron cargar los mensajes.<br>Verificá las reglas de Firestore.</div>`;
+          console.error("Mensajes getDocs error:", err2);
+        }
+      }
+    );
+  } catch(e) {
+    msgsEl.innerHTML = `<div class="text-center py-4 text-muted" style="font-size:.82rem">Iniciá la conversación 👋</div>`;
+    console.error("Mensajes init error:", e);
+  }
+}
+
+function escapeHtml(str) {
+  return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+// Enviar mensaje
+window.chatSendMessage = async function() {
+  if (!currentUser || !chatActiveConvId) return;
+  const input = document.getElementById("chatInput");
+  const texto = input.value.trim();
+  if (!texto) return;
+  input.value = "";
+  input.style.height = "auto";
+
+  const convRef = doc(db, "conversaciones", chatActiveConvId);
+  const convSnap = await getDoc(convRef).catch(() => null);
+  const otherUid = convSnap?.data()?.participantes?.find(p => p !== currentUser.uid);
+
+  try {
+    await addDoc(collection(db, "conversaciones", chatActiveConvId, "mensajes"), {
+      texto,
+      senderUid: currentUser.uid,
+      senderName: currentUserData?.nombre || currentUser.email,
+      createdAt: serverTimestamp()
+    });
+    // Actualizar metadata de conversación
+    const upd = {
+      ultimoMensaje: texto.length > 60 ? texto.slice(0, 57) + "…" : texto,
+      updatedAt: serverTimestamp()
+    };
+    if (otherUid) upd[`noLeidos.${otherUid}`] = (convSnap?.data()?.noLeidos?.[otherUid] || 0) + 1;
+    await updateDoc(convRef, upd);
+  } catch(e) {
+    showToast("❌ Error al enviar mensaje");
+  }
+};
+
+// Mostrar botón de chat en navbar cuando hay sesión
+const _origAuthListener = onAuthStateChanged;
+// Parche: exponer función para que el listener externo active el botón
+window._onChatUserLogin = function() {
+  const btn = document.getElementById("chatNavBtn");
+  if (btn) btn.style.display = "flex";
+};
+window._onChatUserLogout = function() {
+  const btn = document.getElementById("chatNavBtn");
+  if (btn) btn.style.display = "none";
+  updateChatBadge(0);
+  if (chatUnsubscribeConvs) { chatUnsubscribeConvs(); chatUnsubscribeConvs = null; }
+  if (chatUnsubscribeMessages) { chatUnsubscribeMessages(); chatUnsubscribeMessages = null; }
+};
+
+
+// ══════════════════════════════════════
+//  SISTEMA DE ENTREGAS CON GPS
+// ══════════════════════════════════════
+
+let _locationPickerMap = null;
+let _locationPickerMarker = null;
+let _trackingMap = null;
+let _trackingFarmerMarker = null;
+let _trackingClientMarker = null;
+let _gpsWatchId = null;
+
+// ── ABRIR SELECTOR DE UBICACIÓN (cliente) ──
+window.openLocationPicker = function() {
+  const modal = new bootstrap.Modal(document.getElementById("locationPickerModal"));
+  modal.show();
+  document.getElementById("clientLat").value = "";
+  document.getElementById("clientLng").value = "";
+  document.getElementById("clientAddress").value = "";
+  document.getElementById("clientLocationStatus").textContent = "";
+  document.getElementById("confirmLocationBtn").disabled = true;
+
+  setTimeout(() => {
+    if (_locationPickerMap) { _locationPickerMap.remove(); _locationPickerMap = null; }
+    _locationPickerMap = L.map("locationPickerMap").setView([9.9281, -84.0907], 8);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: '© <a href="https://openstreetmap.org">OpenStreetMap</a>'
+    }).addTo(_locationPickerMap);
+
+    _locationPickerMap.on("click", function(e) {
+      const { lat, lng } = e.latlng;
+      setClientLocation(lat, lng, null);
+      reverseGeocode(lat, lng, addr => {
+        document.getElementById("clientLocationStatus").textContent = "📍 " + addr;
+        document.getElementById("clientAddress").value = addr;
+        document.getElementById("clientAddressInput").value = addr;
+      });
+    });
+  }, 350);
+};
+
+function setClientLocation(lat, lng, label) {
+  document.getElementById("clientLat").value = lat;
+  document.getElementById("clientLng").value = lng;
+  document.getElementById("confirmLocationBtn").disabled = false;
+  if (!_locationPickerMap) return;
+  const greenIcon = L.divIcon({
+    html: '<div style="background:#2d6a4f;width:18px;height:18px;border-radius:50%;border:3px solid white;box-shadow:0 2px 6px rgba(0,0,0,.35)"></div>',
+    iconSize: [18,18], iconAnchor: [9,9], className: ""
+  });
+  if (_locationPickerMarker) _locationPickerMarker.remove();
+  _locationPickerMarker = L.marker([lat, lng], { icon: greenIcon })
+    .addTo(_locationPickerMap)
+    .bindPopup(label || "Tu ubicación de entrega").openPopup();
+  _locationPickerMap.setView([lat, lng], 16);
+}
+
+window.pickClientGPS = function() {
+  const statusEl = document.getElementById("clientLocationStatus");
+  if (!navigator.geolocation) { statusEl.textContent = "❌ Tu navegador no soporta GPS"; return; }
+  statusEl.textContent = "📡 Detectando ubicación…";
+  navigator.geolocation.getCurrentPosition(pos => {
+    const { latitude: lat, longitude: lng } = pos.coords;
+    setClientLocation(lat, lng, "Tu ubicación actual");
+    reverseGeocode(lat, lng, addr => {
+      statusEl.textContent = "✓ " + addr;
+      document.getElementById("clientAddress").value = addr;
+      document.getElementById("clientAddressInput").value = addr;
+    });
+  }, () => {
+    statusEl.textContent = "❌ No se pudo obtener GPS. Tocá el mapa para marcar tu posición.";
+  }, { timeout: 10000 });
+};
+
+let _geocodeTimer;
+window.geocodeClientAddress = function() {
+  clearTimeout(_geocodeTimer);
+  _geocodeTimer = setTimeout(async () => {
+    const q = document.getElementById("clientAddressInput").value.trim();
+    if (q.length < 4) return;
+    try {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q + ", Costa Rica")}&format=json&limit=1`,
+        { headers: { "User-Agent": "AgriPlusCR/1.0 (agripluscr@gmail.com)" } }
+      );
+      const data = await res.json();
+      if (data.length) {
+        const { lat, lon, display_name } = data[0];
+        setClientLocation(parseFloat(lat), parseFloat(lon), display_name);
+        document.getElementById("clientAddress").value = display_name;
+        document.getElementById("clientLocationStatus").textContent = "📍 " + display_name;
+      }
+    } catch(e) {}
+  }, 700);
+};
+
+async function reverseGeocode(lat, lng, cb) {
+  try {
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=es`,
+      { headers: { "User-Agent": "AgriPlusCR/1.0 (agripluscr@gmail.com)" } }
+    );
+    const data = await res.json();
+    cb(data.display_name || `${lat.toFixed(5)}, ${lng.toFixed(5)}`);
+  } catch(e) { cb(`${lat.toFixed(5)}, ${lng.toFixed(5)}`); }
+}
+
+window.confirmClientLocation = async function() {
+  const lat = parseFloat(document.getElementById("clientLat").value);
+  const lng = parseFloat(document.getElementById("clientLng").value);
+  const address = document.getElementById("clientAddress").value || `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+  if (!lat || !lng) { showToast("📍 Marcá primero tu ubicación en el mapa"); return; }
+
+  const cartItems = window._pendingOrderCart || cart;
+  if (!cartItems.length) return;
+  const total = cartItems.reduce((s, c) => s + c.price * c.qty, 0);
+  const pedido = {
+    items: cartItems.map(c => ({ id: c.firestoreId, name: c.name, emoji: c.emoji, price: c.price, qty: c.qty, unit: c.unit })),
+    total,
+    uid: currentUser.uid,
+    clienteNombre: currentUserData?.nombre || currentUser.email,
+    clienteEmail: currentUser.email,
+    clienteLat: lat,
+    clienteLng: lng,
+    clienteAddress: address,
+    estado: "pendiente",
+    createdAt: serverTimestamp()
+  };
+
+  const btn = document.getElementById("confirmLocationBtn");
+  btn.disabled = true;
+  btn.textContent = "Confirmando…";
+  try {
+    await addDoc(collection(db, "pedidos"), pedido);
+    showToast("🎉 ¡Pedido confirmado con ubicación GPS!");
+    cart = [];
+    window._pendingOrderCart = null;
+    renderCart();
+    bootstrap.Modal.getInstance(document.getElementById("locationPickerModal"))?.hide();
+    const offcanvas = bootstrap.Offcanvas.getInstance(document.getElementById("cartSidebar"));
+    if (offcanvas) offcanvas.hide();
+  } catch(e) {
+    showToast("❌ Error al confirmar pedido.");
+  }
+  btn.disabled = false;
+  btn.innerHTML = '<i class="bi bi-check-lg me-1"></i> Confirmar ubicación y pedir';
+};
+
+// ── AGRICULTOR COMPARTE SU GPS EN TIEMPO REAL ──
+window.compartirGPSAgricultor = function(pedidoId) {
+  if (!navigator.geolocation) { showToast("❌ Tu dispositivo no soporta GPS"); return; }
+  if (_gpsWatchId !== null) {
+    navigator.geolocation.clearWatch(_gpsWatchId);
+    _gpsWatchId = null;
+    showToast("📍 GPS detenido");
+    return;
+  }
+  showToast("📡 Compartiendo tu GPS en tiempo real…");
+  _gpsWatchId = navigator.geolocation.watchPosition(async pos => {
+    const { latitude: lat, longitude: lng } = pos.coords;
+    try {
+      await updateDoc(doc(db, "pedidos", pedidoId), {
+        farmLat: lat,
+        farmLng: lng,
+        farmUpdatedAt: serverTimestamp()
+      });
+    } catch(e) {}
+  }, err => {
+    showToast("❌ No se pudo obtener GPS");
+    _gpsWatchId = null;
+  }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 5000 });
+};
+
+// ── GESTIÓN DE ENTREGAS (agricultor) ──
+window.openEntregasModal = async function() {
+  if (!currentUser) { showToast("🔒 Iniciá sesión"); return; }
+  const role = currentUserData?.tipo;
+  if (role !== "agricultor" && role !== "admin") { showToast("🌾 Solo agricultores pueden ver entregas"); return; }
+
+  const modal = new bootstrap.Modal(document.getElementById("entregasModal"));
+  modal.show();
+  const body = document.getElementById("entregasBody");
+  body.innerHTML = `<div class="text-center py-4 text-muted"><div class="spinner-border spinner-border-sm me-2"></div>Cargando entregas...</div>`;
+
+  try {
+    const snap = await getDocs(collection(db, "pedidos"));
+    let pedidos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    if (role === "agricultor") {
+      const misIds = allProducts.filter(p => p.uid === currentUser.uid).map(p => p.firestoreId);
+      pedidos = pedidos.filter(p => (p.items || []).some(i => misIds.includes(i.id)));
+    }
+    pedidos = pedidos.filter(p => p.clienteLat && p.clienteLng);
+    pedidos.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+
+    if (!pedidos.length) {
+      body.innerHTML = `<div class="text-center py-5"><div style="font-size:2.5rem;margin-bottom:.75rem">🗺️</div><p style="color:var(--muted)">Ningún pedido tiene ubicación de entrega registrada.</p></div>`;
+      return;
+    }
+
+    body.innerHTML = `
+      <p style="font-size:.85rem;color:var(--muted);margin-bottom:1rem">
+        <i class="bi bi-info-circle me-1"></i> Usá <strong>Mi GPS</strong> para compartir tu ubicación en tiempo real con el cliente.
+      </p>` +
+      pedidos.map(p => {
+        const est = estadoColors[p.estado] || estadoColors.pendiente;
+        const items = (p.items || []).map(i => `${i.emoji || ""} ${i.name} ×${i.qty}`).join(", ");
+        return `
+          <div class="entrega-card">
+            <div class="ec-header">
+              <div style="flex:1">
+                <div style="font-weight:600;font-size:.9rem;margin-bottom:3px">${p.clienteNombre || "Cliente"}</div>
+                <div style="font-size:.8rem;color:var(--charcoal);margin-bottom:4px">${items}</div>
+                <div style="font-size:.76rem;color:var(--green-mid)"><i class="bi bi-geo-alt-fill me-1"></i>${p.clienteAddress || (p.clienteLat?.toFixed(4)+", "+p.clienteLng?.toFixed(4))}</div>
+              </div>
+              <div style="text-align:right">
+                <span class="delivery-status-badge ${p.estado==="en camino"?"en-camino":p.estado||"pendiente"}">${est.label}</span>
+                <br>
+                <div class="d-flex gap-1 mt-2 justify-content-end flex-wrap">
+                  <a href="https://maps.google.com/?q=${p.clienteLat},${p.clienteLng}" target="_blank" style="background:#e0f2fe;color:#0c4a6e;border:none;border-radius:8px;font-size:.75rem;font-weight:600;padding:4px 9px;cursor:pointer;text-decoration:none"><i class="bi bi-map me-1"></i>Navegar</a>
+                  <button onclick="compartirGPSAgricultor('${p.id}')" style="background:var(--green-mid);border:none;border-radius:8px;color:white;font-size:.75rem;font-weight:600;padding:4px 9px;cursor:pointer;display:inline-flex;align-items:center;gap:4px">
+                    <span class="gps-pulse" style="width:10px;height:10px"></span> Mi GPS
+                  </button>
+                  <select onchange="cambiarEstadoPedido('${p.id}',this.value)" style="border:1.5px solid var(--border);border-radius:8px;padding:3px 6px;font-size:.73rem;font-weight:600;background:${est.bg};color:${est.color};cursor:pointer">
+                    ${["pendiente","en camino","entregado","cancelado"].map(s =>
+                      `<option value="${s}" ${p.estado===s?"selected":""}>${estadoColors[s]?.label||s}</option>`
+                    ).join("")}
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>`;
+      }).join("");
+  } catch(e) {
+    body.innerHTML = `<p class="text-danger p-3">Error al cargar entregas.</p>`;
+  }
+};
+
+// ── TRACKING MODAL (cliente) ──
+window.openTrackingModal = async function(pedidoId) {
+  const modal = new bootstrap.Modal(document.getElementById("trackingModal"));
+  modal.show();
+  if (window._trackingUnsub) { window._trackingUnsub(); window._trackingUnsub = null; }
+
+  try {
+    const snapDoc = await getDoc(doc(db, "pedidos", pedidoId));
+    if (!snapDoc.exists()) return;
+    const p = { id: snapDoc.id, ...snapDoc.data() };
+    const est = estadoColors[p.estado] || estadoColors.pendiente;
+    const badge = document.getElementById("trackingStatusBadge");
+    badge.textContent = est.label;
+    badge.className = "delivery-status-badge " + (p.estado === "en camino" ? "en-camino" : p.estado || "pendiente");
+    document.getElementById("trackingModalTitle").innerHTML = `<i class="bi bi-broadcast me-2" style="color:var(--green-mid)"></i>Entrega #${pedidoId.slice(-6).toUpperCase()}`;
+    document.getElementById("trackingFarmerGpsInfo").textContent = (p.farmLat && p.farmLng) ? "🟢 GPS activo" : "⚫ Sin GPS del agricultor";
+
+    let infoHtml = "";
+    if (p.clienteLat) infoHtml += `<div><i class="bi bi-geo-alt-fill me-1" style="color:var(--green-mid)"></i><strong>Tu dirección:</strong> ${p.clienteAddress || p.clienteLat?.toFixed(5)+", "+p.clienteLng?.toFixed(5)}</div>`;
+    if (p.farmLat) infoHtml += `<div><i class="bi bi-truck me-1" style="color:var(--amber)"></i><strong>Agricultor:</strong> ubicación en tiempo real</div>`;
+    else infoHtml += `<div style="color:var(--muted)"><i class="bi bi-info-circle me-1"></i>El agricultor aún no está compartiendo su GPS.</div>`;
+    document.getElementById("trackingInfoRow").innerHTML = infoHtml;
+
+    setTimeout(() => {
+      if (_trackingMap) { _trackingMap.remove(); _trackingMap = null; _trackingFarmerMarker = null; _trackingClientMarker = null; }
+      const center = p.clienteLat ? [p.clienteLat, p.clienteLng] : p.farmLat ? [p.farmLat, p.farmLng] : [9.9281, -84.0907];
+      _trackingMap = L.map("trackingMapContainer").setView(center, 14);
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: '© <a href="https://openstreetmap.org">OpenStreetMap</a>'
+      }).addTo(_trackingMap);
+
+      const clientIcon = L.divIcon({ html:'<div style="background:#2d6a4f;width:18px;height:18px;border-radius:50%;border:3px solid white;box-shadow:0 2px 6px rgba(0,0,0,.4)"></div>', iconSize:[18,18], iconAnchor:[9,9], className:"" });
+      const farmIcon   = L.divIcon({ html:'<div style="background:#f4a261;width:18px;height:18px;border-radius:50%;border:3px solid white;box-shadow:0 2px 6px rgba(0,0,0,.4)"></div>', iconSize:[18,18], iconAnchor:[9,9], className:"" });
+
+      if (p.clienteLat) _trackingClientMarker = L.marker([p.clienteLat, p.clienteLng], { icon: clientIcon }).addTo(_trackingMap).bindPopup("📍 Tu destino").openPopup();
+      if (p.farmLat)    _trackingFarmerMarker  = L.marker([p.farmLat,    p.farmLng   ], { icon: farmIcon   }).addTo(_trackingMap).bindPopup("🚜 Agricultor");
+      if (p.clienteLat && p.farmLat) _trackingMap.fitBounds(L.latLngBounds([[p.clienteLat,p.clienteLng],[p.farmLat,p.farmLng]]).pad(0.3));
+
+      // Escuchar cambios en tiempo real
+      const unsub = onSnapshot(doc(db, "pedidos", pedidoId), snap2 => {
+        if (!snap2.exists()) return;
+        const d = snap2.data();
+        if (d.farmLat && d.farmLng) {
+          document.getElementById("trackingFarmerGpsInfo").textContent = "🟢 GPS activo";
+          if (_trackingFarmerMarker) {
+            _trackingFarmerMarker.setLatLng([d.farmLat, d.farmLng]);
+          } else {
+            _trackingFarmerMarker = L.marker([d.farmLat, d.farmLng], { icon: farmIcon }).addTo(_trackingMap).bindPopup("🚜 Agricultor");
+          }
+        }
+        const e2 = estadoColors[d.estado] || estadoColors.pendiente;
+        badge.textContent = e2.label;
+        badge.className = "delivery-status-badge " + (d.estado === "en camino" ? "en-camino" : d.estado || "pendiente");
+      });
+      window._trackingUnsub = unsub;
+    }, 350);
+  } catch(e) {
+    document.getElementById("trackingMapContainer").innerHTML = `<p class="text-danger p-3">Error al cargar el mapa.</p>`;
+  }
+};
+
+window.stopTrackingWatch = function() {
+  if (window._trackingUnsub) { window._trackingUnsub(); window._trackingUnsub = null; }
 };
 
 renderCart();
