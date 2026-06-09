@@ -409,7 +409,34 @@ footer a:hover { color: var(--green-light); }
 .cart-item-emoji { font-size: 2rem; width: 50px; text-align: center; }
 .cart-total { background: var(--green-dark); color: white; border-radius: 16px; padding: 1.25rem; margin-top: 1rem; }
 
-/* ── RESPONSIVE TWEAKS ── */
+/* ── PERFIL INSTAGRAM STYLE ── */
+.profile-avatar {
+  width: 90px; height: 90px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--green-mid), var(--amber));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2.4rem;
+  color: white;
+  font-weight: 700;
+  border: 3px solid white;
+  box-shadow: 0 0 0 3px var(--green-light);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.profile-stat-box { text-align: center; }
+.profile-stat-num { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700; color: var(--charcoal); display: block; }
+.profile-stat-label { font-size: .72rem; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+.profile-badge-chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: var(--green-pale); color: var(--green-dark);
+  border-radius: 20px; padding: 3px 12px;
+  font-size: .78rem; font-weight: 600;
+}
+.profile-badge-chip.agricultor { background: #fef3e2; color: #92400e; }
+.profile-badge-chip.empresa { background: #e0f2fe; color: #0c4a6e; }
+.profile-badge-chip.admin { background: #fee2e2; color: #991b1b; }
+
 @media(max-width:768px) {
   .hero { min-height: auto; padding: 4rem 0 3rem; }
   .hero-logo-display { display: none; }
@@ -488,6 +515,27 @@ footer a:hover { color: var(--green-light); }
     </div>
   </div>
 </nav>
+
+<!-- ═══════════════ BARRA DE PERFIL ═══════════════ -->
+<div id="perfilBar" style="display:none;background:var(--green-dark);padding:.5rem 0;border-bottom:1px solid rgba(255,255,255,0.08)">
+  <div class="container d-flex align-items-center justify-content-between flex-wrap gap-2">
+    <div class="d-flex align-items-center gap-3">
+      <div id="perfilBarAvatar" style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--green-light),var(--amber));display:flex;align-items:center;justify-content:center;font-size:.95rem;font-weight:700;color:white;flex-shrink:0">👤</div>
+      <div>
+        <span id="perfilBarNombre" style="font-weight:600;font-size:.85rem;color:white"></span>
+        <span id="perfilBarRol" style="font-size:.75rem;color:rgba(255,255,255,.55);margin-left:8px"></span>
+      </div>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+      <button onclick="openPerfilModal()" style="background:rgba(255,255,255,.1);border:none;border-radius:8px;padding:4px 12px;font-size:.78rem;color:white;cursor:pointer;display:flex;align-items:center;gap:5px">
+        <i class="bi bi-person-gear"></i> Configuración
+      </button>
+      <button onclick="doLogout()" style="background:rgba(239,68,68,.18);border:none;border-radius:8px;padding:4px 12px;font-size:.78rem;color:#fca5a5;cursor:pointer;display:flex;align-items:center;gap:5px">
+        <i class="bi bi-box-arrow-right"></i> Salir
+      </button>
+    </div>
+  </div>
+</div>
 
 <!-- ═══════════════ HERO ═══════════════ -->
 <section class="hero" id="inicio">
@@ -626,6 +674,13 @@ footer a:hover { color: var(--green-light); }
                 <div style="font-size:.72rem;opacity:.6">Ver ventas</div>
               </a>
             </div>
+            <div class="col-6 col-md-3">
+              <a href="javascript:void(0)" onclick="openTiendasModal()" class="panel-action-card">
+                <div class="panel-action-icon"><i class="bi bi-shop-window"></i></div>
+                <div style="font-size:.82rem;font-weight:600">Tiendas</div>
+                <div style="font-size:.72rem;opacity:.6">Insumos & Tech</div>
+              </a>
+            </div>
           </div>
           <div style="margin-top:1.5rem;background:rgba(255,255,255,0.07);border-radius:14px;padding:1rem;display:flex;align-items:center;gap:12px">
             <i class="bi bi-shield-check" style="font-size:1.4rem;color:#95d5b2"></i>
@@ -728,7 +783,7 @@ footer a:hover { color: var(--green-light); }
                   <div class="form-check" style="font-size:.85rem">
                     <input class="form-check-input" type="checkbox" id="terms">
                     <label class="form-check-label text-muted" for="terms">
-                      Acepto los <a href="#" style="color:var(--green-mid)">términos y condiciones</a>
+                      Acepto los <a href="#" style="color:var(--green-mid)" onclick="event.preventDefault();new bootstrap.Modal(document.getElementById('terminosModal')).show()">términos y condiciones</a>
                     </label>
                   </div>
                 </div>
@@ -764,9 +819,9 @@ footer a:hover { color: var(--green-light); }
         </div>
         <p style="font-size:.85rem;line-height:1.7">Conectando el campo con la mesa desde 2026. La plataforma agrícola más confiable de Costa Rica.</p>
         <div class="d-flex gap-3 mt-3">
-          <a href="https://www.facebook.com/share/18caH49JJv/?mibextid=wwXIfr" target="_blank" rel="noopener" style="width:34px;height:34px;background:rgba(255,255,255,0.1);border-radius:8px;display:flex;align-items:center;justify-content:center;color:white"><i class="bi bi-facebook"></i></a>
+          <a href="https://www.facebook.com/share/1Cpgt7hueA/?mibextid=wwXIfr" target="_blank" rel="noopener" style="width:34px;height:34px;background:rgba(255,255,255,0.1);border-radius:8px;display:flex;align-items:center;justify-content:center;color:white"><i class="bi bi-facebook"></i></a>
           <a href="https://instagram.com/agripluscr" target="_blank" rel="noopener" style="width:34px;height:34px;background:rgba(255,255,255,0.1);border-radius:8px;display:flex;align-items:center;justify-content:center;color:white"><i class="bi bi-instagram"></i></a>
-          <a href="https://wa.me/50600000000" target="_blank" rel="noopener" style="width:34px;height:34px;background:rgba(255,255,255,0.1);border-radius:8px;display:flex;align-items:center;justify-content:center;color:white"><i class="bi bi-whatsapp"></i></a>
+          <a href="mailto:agripluscr@gmail.com" style="width:34px;height:34px;background:rgba(255,255,255,0.1);border-radius:8px;display:flex;align-items:center;justify-content:center;color:white" title="Correo: agripluscr@gmail.com"><i class="bi bi-envelope-fill"></i></a>
         </div>
       </div>
       <div class="col-6 col-lg-2">
@@ -774,14 +829,13 @@ footer a:hover { color: var(--green-light); }
         <a href="#">Cómo funciona</a>
         <a href="#">Para agricultores</a>
         <a href="#">Para empresas</a>
-        <a href="#">Precios</a>
+        <a href="#" onclick="event.preventDefault();openTiendasModal()">Tiendas Agrícolas</a>
       </div>
       <div class="col-6 col-lg-2">
         <h5>Soporte</h5>
-        <a href="#">Centro de ayuda</a>
-        <a href="#">Contacto</a>
-        <a href="#">Reportar problema</a>
-        <a href="#">WhatsApp</a>
+        <a href="mailto:agripluscr@gmail.com">Centro de ayuda</a>
+        <a href="mailto:agripluscr@gmail.com">Contacto</a>
+        <a href="mailto:agripluscr@gmail.com">Reportar problema</a>
       </div>
       <div class="col-lg-4">
         <h5>Newsletter</h5>
@@ -796,7 +850,7 @@ footer a:hover { color: var(--green-light); }
       <span>© 2026 AgriPlusCR. Todos los derechos reservados.</span>
       <div class="d-flex gap-3">
         <a href="#">Privacidad</a>
-        <a href="#">Términos</a>
+        <a href="#" onclick="event.preventDefault();new bootstrap.Modal(document.getElementById('terminosModal')).show()">Términos</a>
         <a href="#">Cookies</a>
       </div>
     </div>
@@ -915,15 +969,30 @@ footer a:hover { color: var(--green-light); }
           </div>
           <div class="col-3">
             <label class="form-label">Precio (₡)</label>
-            <input type="number" class="form-control" id="pPrice" placeholder="1200">
+            <input type="text" inputmode="numeric" pattern="[0-9]*" class="form-control" id="pPrice" placeholder="1200" oninput="this.value=this.value.replace(/[^0-9]/g,'').replace(/^0+/,'')">
           </div>
           <div class="col-3">
             <label class="form-label">Unidad</label>
-            <input type="text" class="form-control" id="pUnit" placeholder="kg">
+            <select class="form-select" id="pUnit">
+              <option value="kg" selected>kg</option>
+              <option value="unidad">Unidad</option>
+              <option value="g">g (gramos)</option>
+              <option value="lb">lb (libra)</option>
+              <option value="saco">Saco</option>
+              <option value="caja">Caja</option>
+              <option value="docena">Docena</option>
+              <option value="manojo">Manojo</option>
+            </select>
           </div>
           <div class="col-8">
             <label class="form-label">Origen / Agricultor</label>
-            <input type="text" class="form-control" id="pOrigin" placeholder="Ej: Finca Los Olivos, Cartago">
+            <div class="d-flex gap-1">
+              <input type="text" class="form-control" id="pOrigin" placeholder="Ej: Finca Los Olivos, Cartago">
+              <button type="button" title="Usar mi ubicación" onclick="detectarUbicacion()" style="background:var(--green-pale);border:1.5px solid var(--border);border-radius:10px;padding:0 .65rem;color:var(--green-dark);cursor:pointer;flex-shrink:0;font-size:1rem" id="btnGeo">
+                <i class="bi bi-geo-alt-fill"></i>
+              </button>
+            </div>
+            <div id="geoStatus" style="font-size:.73rem;color:var(--muted);margin-top:3px;display:none"></div>
           </div>
           <div class="col-4">
             <label class="form-label">Badge</label>
@@ -971,6 +1040,223 @@ footer a:hover { color: var(--green-light); }
       </div>
       <div class="modal-body p-4" id="pedidosRecibidosBody">
         <div class="text-center py-4 text-muted"><div class="spinner-border spinner-border-sm me-2"></div>Cargando...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ PERFIL USUARIO ═══════════════ -->
+<div class="modal fade" id="perfilModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered" style="max-width:440px">
+    <div class="modal-content">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title">Mi Perfil</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+        <!-- Header tipo Instagram -->
+        <div class="d-flex align-items-center gap-4 mb-4">
+          <div style="position:relative;flex-shrink:0;cursor:pointer" onclick="document.getElementById('perfilFotoInput').click()" title="Cambiar foto de perfil">
+            <div class="profile-avatar" id="perfilAvatar">👤</div>
+            <div style="position:absolute;inset:0;border-radius:50%;background:rgba(0,0,0,0.42);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s"
+              onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0">
+              <i class="bi bi-camera-fill" style="color:white;font-size:1.3rem"></i>
+            </div>
+            <div style="position:absolute;bottom:2px;right:2px;width:24px;height:24px;background:var(--green-mid);border-radius:50%;border:2px solid white;display:flex;align-items:center;justify-content:center">
+              <i class="bi bi-camera-fill" style="color:white;font-size:.6rem"></i>
+            </div>
+          </div>
+          <input type="file" id="perfilFotoInput" accept="image/*" style="display:none" onchange="subirFotoPerfil(this)">
+          <div style="flex:1">
+            <div style="font-weight:700;font-size:1.1rem;margin-bottom:2px" id="perfilNombre">—</div>
+            <div style="font-size:.82rem;color:var(--muted);margin-bottom:4px" id="perfilEmail">—</div>
+            <div style="font-size:.73rem;color:var(--green-mid);min-height:1rem" id="perfilFotoStatus"></div>
+            <span class="profile-badge-chip mt-1" id="perfilRolChip"><i class="bi bi-person-fill me-1"></i><span id="perfilRolLabel">Cliente</span></span>
+          </div>
+        </div>
+        <div class="d-flex justify-content-around border rounded-3 py-3 mb-4" style="border-color:var(--border)!important">
+          <div class="profile-stat-box">
+            <span class="profile-stat-num" id="perfilNumProductos">0</span>
+            <span class="profile-stat-label">Productos</span>
+          </div>
+          <div style="width:1px;background:var(--border)"></div>
+          <div class="profile-stat-box">
+            <span class="profile-stat-num" id="perfilNumPedidos">0</span>
+            <span class="profile-stat-label">Pedidos</span>
+          </div>
+          <div style="width:1px;background:var(--border)"></div>
+          <div class="profile-stat-box">
+            <span class="profile-stat-num" id="perfilFecha">—</span>
+            <span class="profile-stat-label">Desde</span>
+          </div>
+        </div>
+        <!-- Info -->
+        <div style="background:var(--cream);border-radius:12px;padding:1rem;font-size:.85rem">
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <i class="bi bi-telephone-fill" style="color:var(--green-mid)"></i>
+            <span id="perfilTelefono" style="color:var(--muted)">Sin teléfono registrado</span>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-shield-check-fill" style="color:var(--green-mid)"></i>
+            <span style="color:var(--muted)">Cuenta verificada · AgriPlusCR</span>
+          </div>
+        </div>
+        <div class="d-flex gap-2 mt-4">
+          <a href="mailto:agripluscr@gmail.com" class="btn flex-fill" style="background:var(--green-pale);color:var(--green-dark);border-radius:10px;font-weight:600;font-size:.85rem">
+            <i class="bi bi-headset me-1"></i> Soporte
+          </a>
+          <button class="btn flex-fill" style="background:#fee2e2;color:#991b1b;border-radius:10px;font-weight:600;font-size:.85rem" onclick="doLogout();bootstrap.Modal.getInstance(document.getElementById('perfilModal')).hide()">
+            <i class="bi bi-box-arrow-right me-1"></i> Cerrar sesión
+          </button>
+        </div>
+        <div style="border-top:1px solid var(--border);margin-top:1.25rem;padding-top:1.25rem">
+          <div style="font-size:.78rem;color:var(--muted);margin-bottom:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em">Zona de peligro</div>
+          <button onclick="confirmarEliminarCuenta()" style="width:100%;background:none;border:1.5px solid #ef4444;color:#ef4444;border-radius:10px;padding:.55rem;font-weight:600;font-size:.85rem;cursor:pointer;transition:all .2s" onmouseover="this.style.background='#fee2e2'" onmouseout="this.style.background='none'">
+            <i class="bi bi-trash3 me-1"></i> Eliminar mi cuenta permanentemente
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ TIENDAS AGRO ═══════════════ -->
+<div class="modal fade" id="tiendasModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-shop-window me-2"></i>Tiendas & Recursos Agrícolas</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+        <p style="color:var(--muted);font-size:.88rem;margin-bottom:1.5rem">Accedé a proveedores de confianza para insumos agrícolas, pesticidas, tecnología y más.</p>
+        <div class="row g-3">
+          <!-- Pesticidas e insumos -->
+          <div class="col-12"><div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--green-mid);margin-bottom:.5rem">🌿 Pesticidas e Insumos</div></div>
+          <div class="col-md-6">
+            <a href="https://www.colonoagropecuario.com/tienda/?srsltid=AfmBOoquOtLmw4MTH9WOmJWAscFkh77IgjSugD77c8kh-yGPh3C1MEFX" target="_blank" rel="noopener" style="text-decoration:none">
+              <div style="border:1.5px solid var(--border);border-radius:14px;padding:1rem;display:flex;gap:12px;align-items:center;transition:all .2s" onmouseover="this.style.borderColor='var(--green-light)'" onmouseout="this.style.borderColor='var(--border)'">
+                <div style="width:44px;height:44px;background:var(--green-pale);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0">🧪</div>
+                <div>
+                  <div style="font-weight:600;color:var(--charcoal);font-size:.9rem">Colono Agropecuario</div>
+                  <div style="font-size:.78rem;color:var(--muted)">Pesticidas, fertilizantes y más</div>
+                  <div style="font-size:.72rem;color:var(--green-mid);margin-top:2px">colonoagropecuario.com <i class="bi bi-box-arrow-up-right"></i></div>
+                </div>
+              </div>
+            </a>
+          </div>
+          <div class="col-md-6">
+            <a href="https://www.seracsa.com/productos/nacional/fertilizante/especial/" target="_blank" rel="noopener" style="text-decoration:none">
+              <div style="border:1.5px solid var(--border);border-radius:14px;padding:1rem;display:flex;gap:12px;align-items:center;transition:all .2s" onmouseover="this.style.borderColor='var(--green-light)'" onmouseout="this.style.borderColor='var(--border)'">
+                <div style="width:44px;height:44px;background:var(--green-pale);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0">🌱</div>
+                <div>
+                  <div style="font-weight:600;color:var(--charcoal);font-size:.9rem">SERACSA</div>
+                  <div style="font-size:.78rem;color:var(--muted)">Fertilizantes especiales nacionales</div>
+                  <div style="font-size:.72rem;color:var(--green-mid);margin-top:2px">seracsa.com <i class="bi bi-box-arrow-up-right"></i></div>
+                </div>
+              </div>
+            </a>
+          </div>
+          <!-- Tecnología agrícola -->
+          <div class="col-12"><div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--green-mid);margin-bottom:.5rem;margin-top:.5rem">💻 Tecnología Agrícola</div></div>
+          <div class="col-md-6">
+            <a href="https://www.deere.com/es_LA/our-company/contact-us/regions/latin-america/costa-rica.html" target="_blank" rel="noopener" style="text-decoration:none">
+              <div style="border:1.5px solid var(--border);border-radius:14px;padding:1rem;display:flex;gap:12px;align-items:center;transition:all .2s" onmouseover="this.style.borderColor='var(--green-light)'" onmouseout="this.style.borderColor='var(--border)'">
+                <div style="width:44px;height:44px;background:#fef3e2;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0">🚜</div>
+                <div>
+                  <div style="font-weight:600;color:var(--charcoal);font-size:.9rem">John Deere CR</div>
+                  <div style="font-size:.78rem;color:var(--muted)">Maquinaria y equipo agrícola</div>
+                  <div style="font-size:.72rem;color:var(--green-mid);margin-top:2px">deere.com <i class="bi bi-box-arrow-up-right"></i></div>
+                </div>
+              </div>
+            </a>
+          </div>
+          <div class="col-md-6">
+            <a href="https://www.sensoterra.com" target="_blank" rel="noopener" style="text-decoration:none">
+              <div style="border:1.5px solid var(--border);border-radius:14px;padding:1rem;display:flex;gap:12px;align-items:center;transition:all .2s" onmouseover="this.style.borderColor='var(--green-light)'" onmouseout="this.style.borderColor='var(--border)'">
+                <div style="width:44px;height:44px;background:#e0f2fe;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0">📡</div>
+                <div>
+                  <div style="font-weight:600;color:var(--charcoal);font-size:.9rem">Sensoterra</div>
+                  <div style="font-size:.78rem;color:var(--muted)">Sensores IoT para riego inteligente</div>
+                  <div style="font-size:.72rem;color:var(--green-mid);margin-top:2px">sensoterra.com <i class="bi bi-box-arrow-up-right"></i></div>
+                </div>
+              </div>
+            </a>
+          </div>
+          <!-- Semillas -->
+          <div class="col-12"><div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--green-mid);margin-bottom:.5rem;margin-top:.5rem">🌾 Semillas & Mejoras</div></div>
+          <div class="col-md-6">
+            <a href="https://www.elsemillerocr.com/sobres-de-hortalizas" target="_blank" rel="noopener" style="text-decoration:none">
+              <div style="border:1.5px solid var(--border);border-radius:14px;padding:1rem;display:flex;gap:12px;align-items:center;transition:all .2s" onmouseover="this.style.borderColor='var(--green-light)'" onmouseout="this.style.borderColor='var(--border)'">
+                <div style="width:44px;height:44px;background:var(--green-pale);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0">🌻</div>
+                <div>
+                  <div style="font-weight:600;color:var(--charcoal);font-size:.9rem">El Semillero CR</div>
+                  <div style="font-size:.78rem;color:var(--muted)">Sobres de semillas de hortalizas</div>
+                  <div style="font-size:.72rem;color:var(--green-mid);margin-top:2px">elsemillerocr.com <i class="bi bi-box-arrow-up-right"></i></div>
+                </div>
+              </div>
+            </a>
+          </div>
+          <div class="col-md-6">
+            <a href="https://www.mag.go.cr" target="_blank" rel="noopener" style="text-decoration:none">
+              <div style="border:1.5px solid var(--border);border-radius:14px;padding:1rem;display:flex;gap:12px;align-items:center;transition:all .2s" onmouseover="this.style.borderColor='var(--green-light)'" onmouseout="this.style.borderColor='var(--border)'">
+                <div style="width:44px;height:44px;background:var(--green-pale);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0">🏛️</div>
+                <div>
+                  <div style="font-weight:600;color:var(--charcoal);font-size:.9rem">MAG — Ministerio Agricultura</div>
+                  <div style="font-size:.78rem;color:var(--muted)">Recursos, asesorías y subsidios</div>
+                  <div style="font-size:.72rem;color:var(--green-mid);margin-top:2px">mag.go.cr <i class="bi bi-box-arrow-up-right"></i></div>
+                </div>
+              </div>
+            </a>
+          </div>
+        </div>
+        <div style="background:var(--amber-light);border-radius:12px;padding:.85rem 1rem;margin-top:1.5rem;font-size:.82rem;color:#92400e">
+          <i class="bi bi-info-circle me-1"></i> AgriPlusCR no tiene afiliación comercial con estas tiendas. Los enlaces son recursos de referencia para el agricultor.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ TÉRMINOS Y CONDICIONES ═══════════════ -->
+<div class="modal fade" id="terminosModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-file-earmark-text me-2"></i>Términos y Condiciones</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4" style="max-height:70vh;overflow-y:auto">
+        <p style="font-size:.82rem;color:var(--muted)">Última actualización: junio 2026 · Versión 1.0</p>
+        <p style="font-size:.88rem;line-height:1.8">Al registrarte y utilizar AgriPlusCR aceptás los siguientes términos. Si tenés dudas, escribinos a <a href="mailto:agripluscr@gmail.com" style="color:var(--green-mid)">agripluscr@gmail.com</a>.</p>
+
+        <h6 style="font-family:'Playfair Display',serif;margin-top:1.5rem">1. Uso de la plataforma</h6>
+        <p style="font-size:.85rem;line-height:1.8;color:var(--muted)">AgriPlusCR es una plataforma digital de comercio agrícola que conecta agricultores y consumidores en Costa Rica. El uso de la plataforma es gratuito para el registro. Nos reservamos el derecho de suspender cuentas que incumplan estos términos.</p>
+
+        <h6 style="font-family:'Playfair Display',serif;margin-top:1.25rem">2. Protección de datos (Ley 8968 — Costa Rica)</h6>
+        <p style="font-size:.85rem;line-height:1.8;color:var(--muted)">De conformidad con la <strong>Ley de Protección de la Persona frente al tratamiento de sus datos personales (Ley N.° 8968)</strong>, los datos que recopilamos (nombre, correo, teléfono, tipo de usuario) se usan exclusivamente para el funcionamiento de la plataforma. No vendemos ni compartimos datos con terceros sin consentimiento expreso. Tenés derecho de acceso, rectificación y supresión de tus datos.</p>
+
+        <h6 style="font-family:'Playfair Display',serif;margin-top:1.25rem">3. Responsabilidad sobre los productos</h6>
+        <p style="font-size:.85rem;line-height:1.8;color:var(--muted)">AgriPlusCR actúa como intermediario tecnológico. La responsabilidad sobre la calidad, inocuidad y legalidad de los productos publicados recae sobre el agricultor o vendedor. Los productos agrícolas deben cumplir con las regulaciones del <strong>SENASA</strong> (Servicio Nacional de Salud Animal) y el <strong>MAG</strong> (Ministerio de Agricultura y Ganadería).</p>
+
+        <h6 style="font-family:'Playfair Display',serif;margin-top:1.25rem">4. Comercio electrónico (Ley 7472)</h6>
+        <p style="font-size:.85rem;line-height:1.8;color:var(--muted)">Las transacciones realizadas a través de AgriPlusCR están sujetas a la <strong>Ley de Promoción de la Competencia y Defensa Efectiva del Consumidor (Ley N.° 7472)</strong>. Los precios mostrados incluyen impuestos aplicables. Los consumidores tienen derecho a retracto según la legislación vigente.</p>
+
+        <h6 style="font-family:'Playfair Display',serif;margin-top:1.25rem">5. Propiedad intelectual</h6>
+        <p style="font-size:.85rem;line-height:1.8;color:var(--muted)">El logo, nombre "AgriPlusCR" y diseño de la plataforma son propiedad de sus creadores. Está prohibida su reproducción total o parcial sin autorización escrita.</p>
+
+        <h6 style="font-family:'Playfair Display',serif;margin-top:1.25rem">6. Pagos y comisiones</h6>
+        <p style="font-size:.85rem;line-height:1.8;color:var(--muted)">El registro en la plataforma es gratuito. AgriPlusCR puede establecer comisiones por transacciones en el futuro, con previo aviso a los usuarios. Los pagos se procesan mediante pasarelas seguras externas; AgriPlusCR no almacena datos de tarjetas de crédito.</p>
+
+        <h6 style="font-family:'Playfair Display',serif;margin-top:1.25rem">7. Modificaciones</h6>
+        <p style="font-size:.85rem;line-height:1.8;color:var(--muted)">Nos reservamos el derecho de actualizar estos términos. Te notificaremos por correo ante cambios significativos. El uso continuado de la plataforma implica la aceptación de los nuevos términos.</p>
+
+        <div style="background:var(--green-pale);border-radius:12px;padding:1rem;margin-top:1.5rem;font-size:.82rem;color:var(--green-dark)">
+          <i class="bi bi-shield-check me-1"></i> <strong>Legislación aplicable:</strong> Ley N.° 8968 (Datos personales), Ley N.° 7472 (Consumidor), regulaciones SENASA y MAG de Costa Rica.
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" style="background:var(--green-mid);color:white;border-radius:10px;font-weight:600;font-size:.88rem" data-bs-dismiss="modal">Entendido</button>
       </div>
     </div>
   </div>
@@ -1054,12 +1340,24 @@ onAuthStateChanged(auth, async (user) => {
       renderAdminTable();
     }
     showToast(`👋 ¡Bienvenido, ${name.split(" ")[0]}!`);
+    // Barra de perfil superior
+    document.getElementById("perfilBar").style.display = "block";
+    document.getElementById("perfilBarNombre").textContent = name;
+    const rolNames2 = { cliente: "Cliente", agricultor: "Agricultor 🌾", empresa: "Empresa", admin: "Admin 🛡️" };
+    document.getElementById("perfilBarRol").textContent = rolNames2[role] || role;
+    const barAvatar = document.getElementById("perfilBarAvatar");
+    if (currentUserData?.fotoUrl) {
+      barAvatar.innerHTML = `<img src="${currentUserData.fotoUrl}" style="width:32px;height:32px;border-radius:50%;object-fit:cover">`;
+    } else {
+      barAvatar.textContent = name.charAt(0).toUpperCase();
+    }
   } else {
     currentUserData = null;
     document.getElementById("loginBtnText").textContent = "Iniciar sesión";
     document.getElementById("loginToggleBtn").classList.remove("logged");
     document.getElementById("misPedidosBtn").style.display = "none";
     document.getElementById("adminSection").style.display = "none";
+    document.getElementById("perfilBar").style.display = "none";
   }
   loadAllProducts();
 });
@@ -1193,8 +1491,167 @@ function renderCart() {
 //  LOGIN / LOGOUT
 // ══════════════════════════════════════
 window.toggleLoginModal = function() {
-  if (currentUser) { doLogout(); return; }
+  if (currentUser) {
+    // Abrir modal de perfil estilo Instagram
+    openPerfilModal();
+    return;
+  }
   new bootstrap.Modal(document.getElementById("loginModal")).show();
+};
+
+window.openPerfilModal = async function() {
+  if (!currentUser) return;
+  const modal = new bootstrap.Modal(document.getElementById("perfilModal"));
+  modal.show();
+  // Nombre y email
+  const nombre = currentUserData?.nombre || currentUser.email;
+  const tipo = currentUserData?.tipo || "cliente";
+  document.getElementById("perfilNombre").textContent = nombre;
+  document.getElementById("perfilEmail").textContent = currentUser.email;
+  document.getElementById("perfilTelefono").textContent = currentUserData?.telefono || "Sin teléfono registrado";
+  document.getElementById("perfilFotoStatus").textContent = "";
+  // Avatar: foto guardada o inicial
+  const avatarEl = document.getElementById("perfilAvatar");
+  if (currentUserData?.fotoUrl) {
+    avatarEl.innerHTML = `<img src="${currentUserData.fotoUrl}" alt="Foto de perfil" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+  } else {
+    avatarEl.textContent = nombre.charAt(0).toUpperCase();
+  }
+  // Rol chip
+  const chip = document.getElementById("perfilRolChip");
+  const rolLabel = document.getElementById("perfilRolLabel");
+  chip.className = "profile-badge-chip " + tipo;
+  const rolNames = { cliente: "Cliente", agricultor: "Agricultor", empresa: "Empresa", admin: "Administrador" };
+  rolLabel.textContent = rolNames[tipo] || tipo;
+  // Fecha de registro
+  const createdAt = currentUserData?.createdAt?.seconds;
+  document.getElementById("perfilFecha").textContent = createdAt
+    ? new Date(createdAt * 1000).toLocaleDateString("es-CR", { month: "short", year: "numeric" })
+    : "2026";
+  // Contar productos del usuario
+  const misProductos = allProducts.filter(p => p.uid === currentUser.uid);
+  document.getElementById("perfilNumProductos").textContent = misProductos.length;
+  // Contar pedidos
+  try {
+    const { getDocs, collection, query, where } = window._fb;
+    const db = window._fb.db;
+    const q = query(collection(db, "pedidos"), where("uid", "==", currentUser.uid));
+    const snap = await getDocs(q);
+    document.getElementById("perfilNumPedidos").textContent = snap.size;
+  } catch(e) {
+    document.getElementById("perfilNumPedidos").textContent = "—";
+  }
+};
+
+// ══════════════════════════════════════
+//  FOTO DE PERFIL — CLOUDINARY + FIRESTORE
+// ══════════════════════════════════════
+window.subirFotoPerfil = async function(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 2 * 1024 * 1024) { showToast("❌ La foto debe pesar menos de 2MB"); input.value = ""; return; }
+
+  const statusEl = document.getElementById("perfilFotoStatus");
+  const avatarEl = document.getElementById("perfilAvatar");
+
+  // Preview inmediato local
+  const reader = new FileReader();
+  reader.onload = e => {
+    avatarEl.innerHTML = `<img src="${e.target.result}" alt="Foto" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+    // También actualizar barra superior
+    document.getElementById("perfilBarAvatar").innerHTML = `<img src="${e.target.result}" style="width:32px;height:32px;border-radius:50%;object-fit:cover">`;
+  };
+  reader.readAsDataURL(file);
+
+  statusEl.textContent = "Subiendo foto...";
+
+  // Subir a Cloudinary (mismo preset que productos)
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("upload_preset", "agriplus_upload");
+  formData.append("folder", "perfiles");
+
+  try {
+    const res = await fetch(`https://api.cloudinary.com/v1_1/dljvu1fz0/image/upload`, {
+      method: "POST",
+      body: formData
+    });
+    const data = await res.json();
+    if (!data.secure_url) throw new Error("Sin URL");
+
+    // Guardar URL en Firestore en el documento del usuario
+    const { doc, updateDoc } = window._fb;
+    const db = window._fb.db;
+    await updateDoc(doc(db, "usuarios", currentUser.uid), { fotoUrl: data.secure_url });
+    currentUserData.fotoUrl = data.secure_url;
+
+    statusEl.textContent = "✓ Foto actualizada";
+    showToast("✅ Foto de perfil guardada");
+    input.value = "";
+  } catch(e) {
+    statusEl.textContent = "❌ Error al subir. Intentá de nuevo.";
+    showToast("❌ No se pudo guardar la foto");
+  }
+};
+
+// ══════════════════════════════════════
+//  GEOLOCALIZACIÓN (Nominatim / OpenStreetMap — sin Google Maps)
+// ══════════════════════════════════════
+window.detectarUbicacion = function() {
+  const statusEl = document.getElementById("geoStatus");
+  const btn = document.getElementById("btnGeo");
+  if (!navigator.geolocation) {
+    statusEl.textContent = "Tu navegador no soporta geolocalización.";
+    statusEl.style.display = "block";
+    return;
+  }
+  statusEl.textContent = "Detectando ubicación...";
+  statusEl.style.color = "var(--muted)";
+  statusEl.style.display = "block";
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm" style="width:14px;height:14px"></span>';
+  btn.disabled = true;
+  navigator.geolocation.getCurrentPosition(async (pos) => {
+    const { latitude, longitude } = pos.coords;
+    try {
+      // Nominatim: geocodificador de OpenStreetMap, uso libre (ODbL)
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&accept-language=es`,
+        { headers: { "User-Agent": "AgriPlusCR/1.0 (agripluscr@gmail.com)" } }
+      );
+      const data = await res.json();
+      const addr = data.address || {};
+      const partes = [
+        addr.village || addr.suburb || addr.town || addr.city || "",
+        addr.county || addr.state_district || "",
+        addr.state || ""
+      ].filter(Boolean);
+      const ubicacion = partes.join(", ");
+      document.getElementById("pOrigin").value = ubicacion || `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+      statusEl.textContent = "✓ Ubicación detectada";
+      statusEl.style.color = "var(--green-mid)";
+    } catch(e) {
+      statusEl.textContent = "No se pudo obtener la dirección. Escribila manualmente.";
+      statusEl.style.color = "var(--muted)";
+    }
+    btn.innerHTML = '<i class="bi bi-geo-alt-fill"></i>';
+    btn.disabled = false;
+  }, (err) => {
+    const msgs = { 1: "Permiso denegado.", 2: "Ubicación no disponible.", 3: "Tiempo agotado." };
+    statusEl.textContent = msgs[err.code] || "Error al detectar ubicación.";
+    statusEl.style.color = "var(--muted)";
+    btn.innerHTML = '<i class="bi bi-geo-alt-fill"></i>';
+    btn.disabled = false;
+  }, { timeout: 10000 });
+};
+
+window.openTiendasModal = function() {
+  const role = currentUserData?.tipo;
+  if (!currentUser || (role !== "agricultor" && role !== "admin")) {
+    showToast("🌾 Solo agricultores pueden acceder a las tiendas");
+    if (!currentUser) new bootstrap.Modal(document.getElementById("loginModal")).show();
+    return;
+  }
+  new bootstrap.Modal(document.getElementById("tiendasModal")).show();
 };
 
 window.doLogin = async function() {
@@ -1217,6 +1674,35 @@ async function doLogout() {
   document.getElementById("adminSection").style.display = "none";
   showToast("👋 Sesión cerrada");
 }
+
+// ══════════════════════════════════════
+//  ELIMINAR CUENTA
+// ══════════════════════════════════════
+window.confirmarEliminarCuenta = async function() {
+  if (!currentUser) return;
+  const confirmacion = confirm(
+    "⚠️ ¿Estás seguro de que querés eliminar tu cuenta?\n\nEsta acción es permanente e irreversible. Se borrarán tus datos de perfil. Tus productos y pedidos existentes permanecerán en la base de datos.\n\nEscribí 'ELIMINAR' en el siguiente paso para confirmar."
+  );
+  if (!confirmacion) return;
+  const texto = prompt("Para confirmar, escribí exactamente: ELIMINAR");
+  if (texto !== "ELIMINAR") { showToast("❌ Eliminación cancelada"); return; }
+  try {
+    // Eliminar documento del usuario en Firestore
+    const { doc, deleteDoc } = window._fb;
+    const db = window._fb.db;
+    await deleteDoc(doc(db, "usuarios", currentUser.uid));
+    // Eliminar cuenta de Firebase Auth
+    await currentUser.delete();
+    bootstrap.Modal.getInstance(document.getElementById("perfilModal"))?.hide();
+    showToast("🗑️ Cuenta eliminada correctamente");
+  } catch(e) {
+    if (e.code === "auth/requires-recent-login") {
+      showToast("🔒 Por seguridad, cerrá sesión, volvé a ingresar y luego eliminá la cuenta.");
+    } else {
+      showToast("❌ Error al eliminar la cuenta. Intentá de nuevo.");
+    }
+  }
+};
 
 // ══════════════════════════════════════
 //  REGISTRO DE CUENTA
@@ -1432,7 +1918,8 @@ window.openAddModal = function() {
   document.getElementById("productModalTitle").textContent = "Agregar producto";
   document.getElementById("editId").value = "";
   document.getElementById("pImageUrl").value = "";
-  ["pEmoji","pName","pPrice","pUnit","pOrigin"].forEach(id => document.getElementById(id).value = "");
+  ["pEmoji","pName","pPrice","pOrigin"].forEach(id => document.getElementById(id).value = "");
+  document.getElementById("pUnit").value = "kg";
   document.getElementById("pCategory").value = "verdura";
   document.getElementById("pBadge").value = "";
   document.getElementById("productModalError").style.display = "none";
@@ -1456,6 +1943,10 @@ window.openEditModal = function(firestoreId) {
   document.getElementById("pName").value = p.name;
   document.getElementById("pCategory").value = p.category;
   document.getElementById("pPrice").value = p.price;
+  // Setear la unidad en el select — si no existe la opción, seleccionar kg
+  const unitSel = document.getElementById("pUnit");
+  const unitExists = Array.from(unitSel.options).some(o => o.value === p.unit);
+  unitSel.value = unitExists ? p.unit : "kg";
   document.getElementById("pUnit").value = p.unit;
   document.getElementById("pOrigin").value = p.origin || "";
   document.getElementById("pBadge").value = p.badge || "";
@@ -1483,7 +1974,7 @@ window.saveProduct = async function() {
   const price = parseInt(document.getElementById("pPrice").value);
   const unit = document.getElementById("pUnit").value.trim();
   const errEl = document.getElementById("productModalError");
-  if (!emoji || !name || !price || !unit) { errEl.textContent = "Por favor completa todos los campos requeridos."; errEl.style.display = "block"; return; }
+  if (!name || !price || price <= 0 || !unit) { errEl.textContent = "Por favor completa todos los campos (precio debe ser mayor a 0)."; errEl.style.display = "block"; return; }
 
   // Bloquear si la foto aún se está subiendo
   const progressText = document.getElementById("uploadProgressText").textContent;
