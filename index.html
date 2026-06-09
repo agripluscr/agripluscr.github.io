@@ -907,7 +907,7 @@ footer a:hover { color: var(--green-light); }
 </section>
 
 <!-- ═══════════════ CTA BANNER ═══════════════ -->
-<section class="py-5" style="background:white">
+<section id="ctaBanner" class="py-5" style="background:white">
   <div class="container">
     <div style="background:linear-gradient(135deg,var(--green-dark) 0%,#1b5e3b 100%);border-radius:28px;padding:3.5rem 2.5rem;text-align:center;position:relative;overflow:hidden">
       <div style="position:absolute;top:-40px;right:-40px;width:200px;height:200px;background:rgba(255,255,255,0.04);border-radius:50%"></div>
@@ -1745,8 +1745,9 @@ onAuthStateChanged(auth, async (user) => {
       renderAdminTable();
     }
     showToast(`👋 ¡Bienvenido, ${name.split(" ")[0]}!`);
-    // Ocultar sección de registro cuando hay sesión activa
+    // Ocultar sección de registro y CTA cuando hay sesión activa
     document.getElementById("registro").style.display = "none";
+    document.getElementById("ctaBanner").style.display = "none";
     document.getElementById("navRegistroLink").style.display = "none";
     // Barra de perfil superior
     document.getElementById("perfilBar").style.display = "block";
@@ -1776,6 +1777,7 @@ onAuthStateChanged(auth, async (user) => {
     // El nav de "Registro" vuelve a mostrarse, pero el formulario permanece oculto
     // hasta que se presione "Crear cuenta gratis"
     document.getElementById("navRegistroLink").style.display = "block";
+    document.getElementById("ctaBanner").style.display = "block";
   }
   loadAllProducts();
 });
@@ -1915,12 +1917,12 @@ function renderCart() {
 // ══════════════════════════════════════
 window.toggleLoginModal = function() {
   if (currentUser) {
-    // Abrir modal de perfil estilo Instagram
     openPerfilModal();
     return;
   }
   new bootstrap.Modal(document.getElementById("loginModal")).show();
 };
+window._toggleLoginModal = window.toggleLoginModal;
 
 // ══════════════════════════════════════
 //  MOSTRAR FORMULARIO DE REGISTRO
@@ -1931,6 +1933,7 @@ window.mostrarFormularioRegistro = function() {
   seccion.style.display = "block";
   setTimeout(() => seccion.scrollIntoView({ behavior: "smooth" }), 50);
 };
+window._mostrarFormularioRegistro = window.mostrarFormularioRegistro;
 
 window.openPerfilModal = async function() {
   if (!currentUser) return;
@@ -3325,6 +3328,29 @@ window.stopTrackingWatch = function() {
 };
 
 renderCart();
+</script>
+
+<!-- Fallback: garantiza que funciones críticas del onclick existan aunque el módulo tarde en cargar -->
+<script>
+function toggleLoginModal() {
+  if (typeof window._toggleLoginModal === 'function') {
+    window._toggleLoginModal();
+  } else {
+    // El módulo aún no cargó, mostrar modal de login directamente
+    var modal = document.getElementById('loginModal');
+    if (modal && window.bootstrap) {
+      new bootstrap.Modal(modal).show();
+    }
+  }
+}
+function mostrarFormularioRegistro() {
+  if (typeof window._mostrarFormularioRegistro === 'function') {
+    window._mostrarFormularioRegistro();
+  } else {
+    var sec = document.getElementById('registro');
+    if (sec) { sec.style.display = 'block'; setTimeout(function(){ sec.scrollIntoView({behavior:'smooth'}); }, 50); }
+  }
+}
 </script>
 </body>
 </html>
