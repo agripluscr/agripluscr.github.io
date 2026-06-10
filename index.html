@@ -1987,6 +1987,13 @@ Object.defineProperty(window, 'currentUser', {
 });
 
 // ══════════════════════════════════════
+//  ADMIN EMAILS — agregá acá los correos que deben ser admin
+// ══════════════════════════════════════
+const ADMIN_EMAILS = [
+  "agripluscr@gmail.com"   // ← cambiá esto por tu correo actual
+];
+
+// ══════════════════════════════════════
 //  AUTH STATE LISTENER
 // ══════════════════════════════════════
 onAuthStateChanged(auth, async (user) => {
@@ -2008,6 +2015,24 @@ onAuthStateChanged(auth, async (user) => {
           if (!q.empty) currentUserData = q.docs[0].data();
         }
       } catch(e) { currentUserData = null; }
+    }
+
+    // Auto-promover a admin si el email está en la lista
+    if (ADMIN_EMAILS.includes(user.email?.toLowerCase()) && currentUserData?.tipo !== "admin") {
+      try {
+        await setDoc(doc(db, "usuarios", user.uid), {
+          uid: user.uid,
+          nombre: currentUserData?.nombre || user.displayName || user.email,
+          email: user.email,
+          telefono: currentUserData?.telefono || "",
+          tipo: "admin",
+          finca: currentUserData?.finca || "",
+          createdAt: currentUserData?.createdAt || serverTimestamp()
+        }, { merge: true });
+        if (!currentUserData) currentUserData = {};
+        currentUserData.tipo = "admin";
+        currentUserData.nombre = currentUserData.nombre || user.displayName || user.email;
+      } catch(e) {}
     }
 
     const name = currentUserData?.nombre || user.email;
@@ -2132,6 +2157,7 @@ function renderProducts() {
         <div class="product-body">
           <div class="product-name">${p.imageUrl ? '' : ''}${p.name}</div>
           <div class="product-origin"><i class="bi bi-geo-alt me-1"></i>${p.origin || "Costa Rica"}</div>
+          ${p.uid && p.uid !== 'demo' && p.ownerName ? `<div style="font-size:.75rem;margin-top:2px"><a href="javascript:void(0)" onclick="openPublicFarmerProfile('${p.uid}')" style="color:var(--green-mid);font-weight:600;text-decoration:none;display:inline-flex;align-items:center;gap:3px"><i class="bi bi-person-fill" style="font-size:.7rem"></i>${p.ownerName}</a></div>` : ""}
           <div class="product-price">₡${p.price.toLocaleString()} <small>/ ${p.unit}</small></div>
         </div>
         <div class="product-footer">
