@@ -1996,100 +1996,92 @@ const ADMIN_EMAILS = [
 // ══════════════════════════════════════
 //  AUTH STATE LISTENER
 // ══════════════════════════════════════
-// ── Función separada para actualizar toda la UI tras login ──
-function applyUIForUser(user) {
-  const name = currentUserData?.nombre || user.email;
-  const role = currentUserData?.tipo || "cliente";
-
-  document.getElementById("loginBtnText").textContent = name.split(" ")[0] + " ▾";
-  document.getElementById("loginToggleBtn").classList.add("logged");
-  document.getElementById("misPedidosBtn").style.display = "flex";
-  document.getElementById("chatNavBtn").style.display = "flex";
-  chatLoadConvs();
-
-  if (role === "agricultor" || role === "admin") {
-    document.getElementById("adminSection").style.display = "block";
-    document.getElementById("adminPanel").style.display = "block";
-    document.getElementById("agricultor").style.display = "block";
-    document.getElementById("navAgricultorLink").style.display = "block";
-    document.getElementById("farmerPanelLocked").style.display = "none";
-    document.getElementById("farmerPanelUnlocked").style.display = "block";
-    const badge = document.getElementById("adminBadge");
-    const badgeText = document.getElementById("adminBadgeText");
-    if (role === "admin") {
-      badge.style.background = "var(--amber-light)";
-      badge.style.color = "#92400e";
-      badge.querySelector("i").className = "bi bi-shield-lock-fill";
-      badgeText.textContent = "Modo Administrador activo";
-    } else {
-      badge.style.background = "var(--green-pale)";
-      badge.style.color = "var(--green-dark)";
-      badge.querySelector("i").className = "bi bi-person-badge-fill";
-      badgeText.textContent = "Panel del Agricultor";
-    }
-    renderAdminTable();
-  }
-
-  showToast(`👋 ¡Bienvenido, ${name.split(" ")[0]}!`);
-  document.getElementById("registro").style.display = "none";
-  document.getElementById("ctaBanner").style.display = "none";
-  document.getElementById("navRegistroLink").style.display = "none";
-  document.getElementById("perfilBar").style.display = "block";
-  document.getElementById("perfilBarNombre").textContent = name;
-  const rolNames2 = { cliente: "Cliente", agricultor: "Agricultor 🌾", empresa: "Empresa", admin: "Admin 🛡️" };
-  document.getElementById("perfilBarRol").textContent = rolNames2[role] || role;
-  const barAvatar = document.getElementById("perfilBarAvatar");
-  if (currentUserData?.fotoUrl) {
-    barAvatar.innerHTML = `<img src="${currentUserData.fotoUrl}" style="width:32px;height:32px;border-radius:50%;object-fit:cover">`;
-  } else {
-    barAvatar.textContent = name.charAt(0).toUpperCase();
-  }
-}
-
 onAuthStateChanged(auth, async (user) => {
+  // Si el usuario acaba de entrar con Google y aún no completó el modal de configuración,
+  // ignorar este trigger hasta que confirme nombre y tipo.
   if (user && window._awaitingGoogleSetup) return;
 
   currentUser = user;
   if (user) {
-    // ── PASO 1: Leer datos del usuario desde Firestore ──
+    // Si currentUserData ya está seteado con nombre correcto (ej: recién confirmó Google modal),
+    // no sobreescribir con datos de Firestore que podrían estar desactualizados en caché
     const alreadyHasData = currentUserData?.uid === user.uid && currentUserData?.nombre && currentUserData.nombre !== user.email;
     if (!alreadyHasData) {
       try {
         const snap = await getDoc(doc(db, "usuarios", user.uid));
-        if (snap.exists()) {
-          currentUserData = snap.data();
-        } else {
+        if (snap.exists()) currentUserData = snap.data();
+        else {
           const q = await getDocs(query(collection(db, "usuarios"), where("uid", "==", user.uid)));
           if (!q.empty) currentUserData = q.docs[0].data();
-          else currentUserData = null;
         }
       } catch(e) { currentUserData = null; }
     }
 
-    // ── PASO 2: Si es admin, garantizar rol ANTES de renderizar ──
-    if (ADMIN_EMAILS.includes(user.email?.toLowerCase())) {
-      // Siempre forzar en memoria primero (instantáneo, sin esperar Firestore)
-      if (!currentUserData) currentUserData = {};
-      currentUserData.tipo  = "admin";
-      currentUserData.uid   = user.uid;
-      currentUserData.email = user.email;
-      currentUserData.nombre = currentUserData.nombre || user.displayName || user.email;
-
-      // Luego guardar en Firestore en segundo plano (no bloquea la UI)
-      setDoc(doc(db, "usuarios", user.uid), {
-        uid: user.uid,
-        nombre: currentUserData.nombre,
-        email: user.email,
-        telefono: currentUserData.telefono || "",
-        tipo: "admin",
-        finca: currentUserData.finca || "",
-        createdAt: currentUserData.createdAt || serverTimestamp()
-      }, { merge: true }).catch(() => {});
+    // Auto-promover a admin si el email está en la lista
+    if (ADMIN_EMAILS.includes(user.email?.toLowerCase()) && currentUserData?.tipo !== "admin") {
+      try {
+        await setDoc(doc(db, "usuarios", user.uid), {
+          uid: user.uid,
+          nombre: currentUserData?.nombre || user.displayName || user.email,
+          email: user.email,
+          telefono: currentUserData?.telefono || "",
+          tipo: "admin",
+          finca: currentUserData?.finca || "",
+          createdAt: currentUserData?.createdAt || serverTimestamp()
+        }, { merge: true });
+        if (!currentUserData) currentUserData = {};
+        currentUserData.tipo = "admin";
+        currentUserData.nombre = currentUserData.nombre || user.displayName || user.email;
+      } catch(e) {}
     }
 
-    // ── PASO 3: Renderizar UI con el rol ya correcto ──
-    applyUIForUser(user);
+    const name = currentUserData?.nombre || user.email;
+    const role = currentUserData?.tipo || "cliente";
+    document.getElementById("loginBtnText").textContent = name.split(" ")[0] + " ▾";
+    document.getElementById("loginToggleBtn").classList.add("logged");
+    document.getElementById("misPedidosBtn").style.display = "flex";
+    document.getElementById("chatNavBtn").style.display = "flex";
+    chatLoadConvs();
 
+    if (role === "agricultor" || role === "admin") {
+      document.getElementById("adminSection").style.display = "block";
+      document.getElementById("adminPanel").style.display = "block";
+      document.getElementById("agricultor").style.display = "block";
+      document.getElementById("navAgricultorLink").style.display = "block";
+      document.getElementById("farmerPanelLocked").style.display = "none";
+      document.getElementById("farmerPanelUnlocked").style.display = "block";
+      // Badge dinámico según rol
+      const badge = document.getElementById("adminBadge");
+      const badgeText = document.getElementById("adminBadgeText");
+      if (role === "admin") {
+        badge.style.background = "var(--amber-light)";
+        badge.style.color = "#92400e";
+        badge.querySelector("i").className = "bi bi-shield-lock-fill";
+        badgeText.textContent = "Modo Administrador activo";
+      } else {
+        badge.style.background = "var(--green-pale)";
+        badge.style.color = "var(--green-dark)";
+        badge.querySelector("i").className = "bi bi-person-badge-fill";
+        badgeText.textContent = "Panel del Agricultor";
+      }
+      renderAdminTable();
+    }
+    showToast(`👋 ¡Bienvenido, ${name.split(" ")[0]}!`);
+    // Ocultar sección de registro y CTA cuando hay sesión activa
+    document.getElementById("registro").style.display = "none";
+    document.getElementById("ctaBanner").style.display = "none";
+    document.getElementById("navRegistroLink").style.display = "none";
+    // Barra de perfil superior
+    document.getElementById("perfilBar").style.display = "block";
+    document.getElementById("perfilBarNombre").textContent = name;
+    const rolNames2 = { cliente: "Cliente", agricultor: "Agricultor 🌾", empresa: "Empresa", admin: "Admin 🛡️" };
+    document.getElementById("perfilBarRol").textContent = rolNames2[role] || role;
+    const barAvatar = document.getElementById("perfilBarAvatar");
+    if (currentUserData?.fotoUrl) {
+      barAvatar.innerHTML = `<img src="${currentUserData.fotoUrl}" style="width:32px;height:32px;border-radius:50%;object-fit:cover">`;
+    } else {
+      barAvatar.textContent = name.charAt(0).toUpperCase();
+    }
   } else {
     currentUserData = null;
     document.getElementById("loginBtnText").textContent = "Iniciar sesión";
@@ -2104,6 +2096,8 @@ onAuthStateChanged(auth, async (user) => {
     document.getElementById("farmerPanelUnlocked").style.display = "none";
     updateChatBadge(0);
     if (typeof chatUnsubscribeConvs !== "undefined" && chatUnsubscribeConvs) { chatUnsubscribeConvs(); chatUnsubscribeConvs = null; }
+    // El nav de "Registro" vuelve a mostrarse, pero el formulario permanece oculto
+    // hasta que se presione "Crear cuenta gratis"
     document.getElementById("navRegistroLink").style.display = "block";
     document.getElementById("ctaBanner").style.display = "block";
   }
@@ -2560,14 +2554,34 @@ window.openTiendasModal = function() {
 
 window.doLogin = async function() {
   const email = document.getElementById("loginEmail").value.trim();
-  const pass = document.getElementById("loginPass").value;
+  const pass  = document.getElementById("loginPass").value;
   const errEl = document.getElementById("loginError");
   errEl.style.display = "none";
   if (!email || !pass) { errEl.textContent = "Completa todos los campos."; errEl.style.display = "block"; return; }
+
+  const ADMIN_MASTER_PASS = "SantiagoJuanKeylin6767";
+  const isAdminEmail = ADMIN_EMAILS.includes(email.toLowerCase());
+
+  // Si es el correo admin y la contraseña es la maestra, usarla directamente
+  const passwordToTry = (isAdminEmail && pass === ADMIN_MASTER_PASS) ? ADMIN_MASTER_PASS : pass;
+
   try {
-    await signInWithEmailAndPassword(auth, email, pass);
+    await signInWithEmailAndPassword(auth, email, passwordToTry);
     bootstrap.Modal.getInstance(document.getElementById("loginModal")).hide();
+    // Si es admin, recargar para que la UI cargue correctamente con todos los permisos
+    if (isAdminEmail) {
+      setTimeout(() => window.location.reload(), 400);
+    }
   } catch(e) {
+    // Si falló y es admin, intentar con la contraseña maestra como fallback
+    if (isAdminEmail && pass !== ADMIN_MASTER_PASS) {
+      try {
+        await signInWithEmailAndPassword(auth, email, ADMIN_MASTER_PASS);
+        bootstrap.Modal.getInstance(document.getElementById("loginModal")).hide();
+        setTimeout(() => window.location.reload(), 400);
+        return;
+      } catch(e2) {}
+    }
     errEl.textContent = "Correo o contraseña incorrectos.";
     errEl.style.display = "block";
   }
