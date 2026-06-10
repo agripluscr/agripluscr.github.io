@@ -954,8 +954,11 @@ footer a:hover { color: var(--green-light); }
                   <input type="text" class="form-control" id="regNombre" placeholder="Juan Pérez">
                 </div>
                 <div class="col-md-6">
-                  <label class="form-label">Teléfono</label>
-                  <input type="tel" class="form-control" id="regTelefono" placeholder="+506 0000-0000">
+                  <label class="form-label">Teléfono <span style="color:var(--muted);font-weight:400;font-size:.82rem">(opcional)</span></label>
+                  <div class="input-group">
+                    <span class="input-group-text" style="background:var(--green-pale);border-color:var(--border);color:var(--green-dark);font-weight:600;font-size:.88rem;border-radius:12px 0 0 12px">+506</span>
+                    <input type="tel" class="form-control" id="regTelefono" placeholder="00000000" maxlength="8" style="border-radius:0 12px 12px 0" oninput="this.value=this.value.replace(/\D/g,'').slice(0,8)">
+                  </div>
                 </div>
                 <div class="col-12">
                   <label class="form-label">Correo electrónico</label>
@@ -1526,6 +1529,17 @@ footer a:hover { color: var(--green-light); }
           <div class="d-flex align-items-center gap-2 mb-2">
             <i class="bi bi-telephone-fill" style="color:var(--green-mid)"></i>
             <span id="perfilTelefono" style="color:var(--muted)">Sin teléfono registrado</span>
+            <button onclick="editarTelefonoPerfil()" id="perfilTelefonoEditBtn" title="Editar" style="background:none;border:none;padding:1px 5px;cursor:pointer;color:var(--muted);font-size:.78rem;border-radius:6px;margin-left:auto;transition:all .2s" onmouseover="this.style.background='var(--green-pale)';this.style.color='var(--green-mid)'" onmouseout="this.style.background='none';this.style.color='var(--muted)'">
+              <i class="bi bi-pencil-fill"></i>
+            </button>
+          </div>
+          <div id="perfilTelefonoEdit" style="display:none;margin-bottom:.5rem">
+            <div style="display:flex;gap:6px;align-items:center">
+              <span style="background:var(--green-pale);border:1.5px solid var(--green-mid);border-right:none;border-radius:8px 0 0 8px;padding:.3rem .55rem;font-size:.85rem;font-weight:600;color:var(--green-dark);white-space:nowrap">+506</span>
+              <input type="tel" id="perfilTelefonoInput" placeholder="00000000" maxlength="8" style="border:1.5px solid var(--green-mid);border-left:none;border-radius:0 8px 8px 0;padding:.3rem .6rem;font-size:.85rem;flex:1;outline:none;min-width:0" oninput="this.value=this.value.replace(/\D/g,'').slice(0,8)">
+              <button onclick="guardarTelefonoPerfil()" style="background:var(--green-mid);color:white;border:none;border-radius:8px;padding:.3rem .7rem;cursor:pointer;font-size:.82rem;font-weight:600">Guardar</button>
+              <button onclick="cancelarEditarTelefono()" style="background:none;border:1.5px solid var(--border);border-radius:8px;padding:.3rem .7rem;cursor:pointer;font-size:.82rem;color:var(--muted)">✕</button>
+            </div>
           </div>
           <div id="perfilFincaRow" style="display:none" class="d-flex align-items-center gap-2 mb-2">
             <i id="perfilFincaIcon" class="bi bi-tree-fill" style="color:var(--green-mid)"></i>
@@ -2037,10 +2051,11 @@ function renderCart() {
   const summaryEl = document.getElementById("cartSummary");
   const emptyEl = document.getElementById("emptyCart");
   if (!cart.length) {
-    emptyEl.style.display = "block";
-    summaryEl.style.display = "none";
+    // Re-append emptyEl in case it was detached by a previous innerHTML assignment
     itemsEl.innerHTML = "";
     itemsEl.appendChild(emptyEl);
+    emptyEl.style.display = "block";
+    summaryEl.style.display = "none";
     return;
   }
   emptyEl.style.display = "none";
@@ -2131,6 +2146,32 @@ window.guardarFincaPerfil = async function() {
     showToast(esEmpresa ? "❌ Error al guardar la empresa" : "❌ Error al guardar la finca");
   }
 };
+window.editarTelefonoPerfil = function() {
+  const tel = currentUserData?.telefono || "";
+  // Strip +506 prefix if present for editing
+  document.getElementById("perfilTelefonoInput").value = tel.replace(/^\+506/, "");
+  document.getElementById("perfilTelefonoEdit").style.display = "block";
+  document.getElementById("perfilTelefonoInput").focus();
+};
+window.cancelarEditarTelefono = function() {
+  document.getElementById("perfilTelefonoEdit").style.display = "none";
+};
+window.guardarTelefonoPerfil = async function() {
+  const raw = document.getElementById("perfilTelefonoInput").value.replace(/\D/g, "").slice(0, 8);
+  const nuevoTel = raw ? "+506" + raw : "";
+  try {
+    const { doc, updateDoc } = window._fb;
+    const db = window._fb.db;
+    await updateDoc(doc(db, "usuarios", currentUser.uid), { telefono: nuevoTel });
+    currentUserData.telefono = nuevoTel;
+    document.getElementById("perfilTelefono").textContent = nuevoTel || "Sin teléfono registrado";
+    document.getElementById("perfilTelefonoEdit").style.display = "none";
+    showToast("✅ Teléfono actualizado");
+  } catch(e) {
+    showToast("❌ Error al guardar el teléfono");
+  }
+};
+
 window.editarNombrePerfil = function() {
   const input = document.getElementById("perfilNombreInput");
   input.value = document.getElementById("perfilNombre").textContent;
@@ -2168,6 +2209,7 @@ window.openPerfilModal = async function() {
   document.getElementById("perfilEmail").textContent = currentUser.email;
   document.getElementById("perfilTelefono").textContent = currentUserData?.telefono || "Sin teléfono registrado";
   document.getElementById("perfilFotoStatus").textContent = "";
+  document.getElementById("perfilTelefonoEdit").style.display = "none";
   // Finca/Empresa (agricultores y empresas)
   const fincaRow = document.getElementById("perfilFincaRow");
   const fincaIcon = document.getElementById("perfilFincaIcon");
@@ -2558,7 +2600,8 @@ window.confirmarEliminarCuenta = async function() {
 // ══════════════════════════════════════
 window.doRegister = async function() {
   const nombre = document.getElementById("regNombre").value.trim();
-  const telefono = document.getElementById("regTelefono").value.trim();
+  const telRaw = document.getElementById("regTelefono").value.replace(/\D/g, "").slice(0, 8);
+  const telefono = telRaw ? "+506" + telRaw : "";
   const email = document.getElementById("regEmail").value.trim();
   const pass = document.getElementById("regPass").value;
   const tipo = document.getElementById("regTipo").value;
@@ -3380,25 +3423,47 @@ window.chatSendMessage = async function() {
   input.style.height = "auto";
 
   const convRef = doc(db, "conversaciones", chatActiveConvId);
-  const convSnap = await getDoc(convRef).catch(() => null);
-  const otherUid = convSnap?.data()?.participantes?.find(p => p !== currentUser.uid);
 
   try {
+    // Enviar mensaje primero — independiente del estado del doc de conversación
     await addDoc(collection(db, "conversaciones", chatActiveConvId, "mensajes"), {
       texto,
       senderUid: currentUser.uid,
       senderName: currentUserData?.nombre || currentUser.email,
       createdAt: serverTimestamp()
     });
-    // Actualizar metadata de conversación
-    const upd = {
-      ultimoMensaje: texto.length > 60 ? texto.slice(0, 57) + "…" : texto,
-      updatedAt: serverTimestamp()
-    };
-    if (otherUid) upd[`noLeidos.${otherUid}`] = (convSnap?.data()?.noLeidos?.[otherUid] || 0) + 1;
-    await updateDoc(convRef, upd);
+
+    // Actualizar/crear metadata de conversación con setDoc merge para que nunca falle
+    const convSnap = await getDoc(convRef).catch(() => null);
+    const otherUid = convSnap?.data()?.participantes?.find(p => p !== currentUser.uid);
+    const myName = currentUserData?.nombre || currentUser.email;
+    const myRole = currentUserData?.tipo || "cliente";
+    const resumen = texto.length > 60 ? texto.slice(0, 57) + "…" : texto;
+
+    if (!convSnap?.exists()) {
+      // Crear el documento de conversación si aún no existe
+      await setDoc(convRef, {
+        participantes: chatActiveConvId.split("_"),
+        nombres: { [currentUser.uid]: myName },
+        roles: { [currentUser.uid]: myRole },
+        ultimoMensaje: resumen,
+        updatedAt: serverTimestamp(),
+        noLeidos: {}
+      });
+    } else {
+      const noLeidos = convSnap.data()?.noLeidos || {};
+      const upd = {
+        ultimoMensaje: resumen,
+        updatedAt: serverTimestamp(),
+        [`nombres.${currentUser.uid}`]: myName,
+        [`roles.${currentUser.uid}`]: myRole
+      };
+      if (otherUid) upd[`noLeidos.${otherUid}`] = (noLeidos[otherUid] || 0) + 1;
+      await updateDoc(convRef, upd);
+    }
   } catch(e) {
-    showToast("❌ Error al enviar mensaje");
+    console.error("chatSendMessage error:", e);
+    showToast("❌ Error al enviar mensaje. Verificá tu conexión.");
   }
 };
 
