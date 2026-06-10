@@ -2179,17 +2179,29 @@ function renderCart() {
   const itemsEl = document.getElementById("cartItems");
   const summaryEl = document.getElementById("cartSummary");
   const emptyEl = document.getElementById("emptyCart");
+
   if (!cart.length) {
-    // Re-append emptyEl in case it was detached by a previous innerHTML assignment
-    itemsEl.innerHTML = "";
-    itemsEl.appendChild(emptyEl);
+    // Limpiar items pero preservar el emptyCart dentro del DOM
+    Array.from(itemsEl.children).forEach(child => {
+      if (child !== emptyEl) child.remove();
+    });
     emptyEl.style.display = "block";
     summaryEl.style.display = "none";
+    document.getElementById("cartTotalDisplay").textContent = "₡0";
     return;
   }
+
   emptyEl.style.display = "none";
-  itemsEl.innerHTML = cart.map(c => `
-    <div class="cart-item">
+
+  // Eliminar sólo los cart-item dinámicos, no el emptyEl
+  Array.from(itemsEl.children).forEach(child => {
+    if (child !== emptyEl) child.remove();
+  });
+
+  cart.forEach(c => {
+    const div = document.createElement("div");
+    div.className = "cart-item";
+    div.innerHTML = `
       <div class="cart-item-emoji">${c.emoji}</div>
       <div style="flex:1">
         <div style="font-weight:600;font-size:.88rem">${c.name}</div>
@@ -2200,8 +2212,10 @@ function renderCart() {
         <button onclick="removeFromCart('${c.firestoreId}')" style="background:none;border:none;color:var(--muted);font-size:.75rem;cursor:pointer;padding:2px 0">
           <i class="bi bi-trash3"></i> quitar
         </button>
-      </div>
-    </div>`).join("");
+      </div>`;
+    itemsEl.appendChild(div);
+  });
+
   summaryEl.style.display = "block";
   document.getElementById("cartTotalDisplay").textContent = "₡" + total.toLocaleString();
 }
