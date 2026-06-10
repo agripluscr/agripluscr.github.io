@@ -2159,6 +2159,11 @@ document.getElementById("categoryFilter").addEventListener("click", e => {
 //  CARRITO
 // ══════════════════════════════════════
 window.addToCart = function(firestoreId) {
+  if (!currentUser) {
+    showToast("🔒 Iniciá sesión para agregar productos al carrito");
+    new bootstrap.Modal(document.getElementById("loginModal")).show();
+    return;
+  }
   const prod = allProducts.find(p => p.firestoreId === firestoreId);
   if (!prod) return;
   const existing = cart.find(c => c.firestoreId === firestoreId);
