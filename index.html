@@ -2554,34 +2554,14 @@ window.openTiendasModal = function() {
 
 window.doLogin = async function() {
   const email = document.getElementById("loginEmail").value.trim();
-  const pass  = document.getElementById("loginPass").value;
+  const pass = document.getElementById("loginPass").value;
   const errEl = document.getElementById("loginError");
   errEl.style.display = "none";
   if (!email || !pass) { errEl.textContent = "Completa todos los campos."; errEl.style.display = "block"; return; }
-
-  const ADMIN_MASTER_PASS = "SantiagoJuanKeylin6767";
-  const isAdminEmail = ADMIN_EMAILS.includes(email.toLowerCase());
-
-  // Si es el correo admin y la contraseña es la maestra, usarla directamente
-  const passwordToTry = (isAdminEmail && pass === ADMIN_MASTER_PASS) ? ADMIN_MASTER_PASS : pass;
-
   try {
-    await signInWithEmailAndPassword(auth, email, passwordToTry);
+    await signInWithEmailAndPassword(auth, email, pass);
     bootstrap.Modal.getInstance(document.getElementById("loginModal")).hide();
-    // Si es admin, recargar para que la UI cargue correctamente con todos los permisos
-    if (isAdminEmail) {
-      setTimeout(() => window.location.reload(), 400);
-    }
   } catch(e) {
-    // Si falló y es admin, intentar con la contraseña maestra como fallback
-    if (isAdminEmail && pass !== ADMIN_MASTER_PASS) {
-      try {
-        await signInWithEmailAndPassword(auth, email, ADMIN_MASTER_PASS);
-        bootstrap.Modal.getInstance(document.getElementById("loginModal")).hide();
-        setTimeout(() => window.location.reload(), 400);
-        return;
-      } catch(e2) {}
-    }
     errEl.textContent = "Correo o contraseña incorrectos.";
     errEl.style.display = "block";
   }
@@ -3221,7 +3201,7 @@ window.openMisPedidos = async function() {
       const hasLocation = p.clienteLat && p.clienteLng;
       const hasGPS = p.farmLat && p.farmLng;
       return `
-        <div style="border:1px solid var(--border);border-radius:14px;padding:1rem 1.25rem;margin-bottom:.75rem">
+        <div data-pedido-id="${p.id}" style="border:1px solid var(--border);border-radius:14px;padding:1rem 1.25rem;margin-bottom:.75rem">
           <div class="d-flex justify-content-between align-items-start gap-2 flex-wrap">
             <div>
               <div style="font-weight:600;font-size:.9rem;margin-bottom:4px">${items}</div>
@@ -3306,8 +3286,19 @@ window.openPedidosRecibidos = async function(e) {
 
 window.cambiarEstadoPedido = async function(pedidoId, nuevoEstado) {
   try {
-    await updateDoc(doc(db, "pedidos", pedidoId), { estado: nuevoEstado });
-    showToast(`✅ Estado actualizado: ${nuevoEstado}`);
+    if (nuevoEstado === "cancelado") {
+      await deleteDoc(doc(db, "pedidos", pedidoId));
+      const tarjeta = document.querySelector('[data-pedido-id="' + pedidoId + '"]');
+      if (tarjeta) tarjeta.remove();
+      showToast("🗑️ Pedido cancelado y eliminado");
+      const body = document.getElementById("pedidosRecibidosBody");
+      if (body && !body.querySelector("[data-pedido-id]")) {
+        body.innerHTML = '<div class="text-center py-5"><div style="font-size:3rem;margin-bottom:1rem">📭</div><p style="color:var(--muted)">No hay pedidos recibidos aún.</p></div>';
+      }
+    } else {
+      await updateDoc(doc(db, "pedidos", pedidoId), { estado: nuevoEstado });
+      showToast("✅ Estado actualizado: " + nuevoEstado);
+    }
   } catch(e) {
     showToast("❌ Error al actualizar estado");
   }
