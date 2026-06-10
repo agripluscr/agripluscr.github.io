@@ -1140,19 +1140,19 @@ footer a:hover { color: var(--green-light); }
         <p style="font-size:.9rem">Tu carrito está vacío</p>
         <a href="#productos" data-bs-dismiss="offcanvas" class="btn-hero-primary text-decoration-none" style="font-size:.85rem;padding:.6rem 1.5rem">Ver productos</a>
       </div>
-    </div>
-    <div id="cartSummary" style="display:none">
-      <div class="cart-total">
-        <div class="d-flex justify-content-between mb-3">
-          <span style="font-size:.9rem;opacity:.8">Total del pedido</span>
-          <span style="font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700" id="cartTotalDisplay">₡0</span>
+      <div id="cartSummary" style="display:none">
+        <div class="cart-total">
+          <div class="d-flex justify-content-between mb-3">
+            <span style="font-size:.9rem;opacity:.8">Total del pedido</span>
+            <span style="font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700" id="cartTotalDisplay">₡0</span>
+          </div>
+          <button class="w-100 btn" style="background:var(--amber);color:white;border-radius:12px;font-weight:600;padding:.7rem" onclick="confirmOrder()">
+            <i class="bi bi-lightning-fill me-1"></i> Confirmar pedido
+          </button>
+          <button class="w-100 btn mt-2" style="background:rgba(255,255,255,0.1);color:white;border-radius:12px;font-weight:500;font-size:.85rem;padding:.5rem" onclick="clearCart()">
+            Vaciar carrito
+          </button>
         </div>
-        <button class="w-100 btn" style="background:var(--amber);color:white;border-radius:12px;font-weight:600;padding:.7rem" onclick="confirmOrder()">
-          <i class="bi bi-lightning-fill me-1"></i> Confirmar pedido
-        </button>
-        <button class="w-100 btn mt-2" style="background:rgba(255,255,255,0.1);color:white;border-radius:12px;font-weight:500;font-size:.85rem;padding:.5rem" onclick="clearCart()">
-          Vaciar carrito
-        </button>
       </div>
     </div>
   </div>
@@ -1979,6 +1979,13 @@ let currentFilter = "all";
 // ── Exponer funciones al ámbito global ──
 window._fb = { auth, db, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, where, serverTimestamp };
 
+// Siempre mantener window.currentUser sincronizado para que los guards funcionen
+Object.defineProperty(window, 'currentUser', {
+  get: () => currentUser,
+  set: (v) => { currentUser = v; },
+  configurable: true
+});
+
 // ══════════════════════════════════════
 //  AUTH STATE LISTENER
 // ══════════════════════════════════════
@@ -2181,15 +2188,17 @@ function renderCart() {
   const total = cart.reduce((s, c) => s + c.price * c.qty, 0);
   const count = cart.reduce((s, c) => s + c.qty, 0);
   countEl.textContent = count;
-  const itemsEl = document.getElementById("cartItems");
+
+  const itemsEl  = document.getElementById("cartItems");
   const summaryEl = document.getElementById("cartSummary");
-  const emptyEl = document.getElementById("emptyCart");
+  const emptyEl  = document.getElementById("emptyCart");
+
+  // Eliminar solo los cart-item dinámicos
+  Array.from(itemsEl.children).forEach(child => {
+    if (child !== emptyEl && child !== summaryEl) child.remove();
+  });
 
   if (!cart.length) {
-    // Limpiar items pero preservar el emptyCart dentro del DOM
-    Array.from(itemsEl.children).forEach(child => {
-      if (child !== emptyEl) child.remove();
-    });
     emptyEl.style.display = "block";
     summaryEl.style.display = "none";
     document.getElementById("cartTotalDisplay").textContent = "₡0";
@@ -2197,11 +2206,6 @@ function renderCart() {
   }
 
   emptyEl.style.display = "none";
-
-  // Eliminar sólo los cart-item dinámicos, no el emptyEl
-  Array.from(itemsEl.children).forEach(child => {
-    if (child !== emptyEl) child.remove();
-  });
 
   cart.forEach(c => {
     const div = document.createElement("div");
@@ -2218,7 +2222,7 @@ function renderCart() {
           <i class="bi bi-trash3"></i> quitar
         </button>
       </div>`;
-    itemsEl.appendChild(div);
+    itemsEl.insertBefore(div, summaryEl);
   });
 
   summaryEl.style.display = "block";
@@ -4167,7 +4171,7 @@ window.openPublicFarmerProfile = async function(farmUid) {
             <div class="pub-product-emoji">${p.imageUrl?`<img src="${p.imageUrl}" style="width:36px;height:36px;object-fit:cover;border-radius:8px">`:p.emoji}</div>
             <div style="flex:1"><div style="font-weight:600;font-size:.88rem">${p.name}</div><div style="font-size:.75rem;color:var(--muted)">${p.origin||"Costa Rica"}</div></div>
             <div style="font-family:'Playfair Display',serif;font-weight:700;color:var(--green-dark);font-size:.95rem">₡${p.price.toLocaleString()}<small style="font-family:'DM Sans',sans-serif;font-size:.7rem;font-weight:400;color:var(--muted)">/${p.unit}</small></div>
-            <button onclick="addToCart('${p.firestoreId}'); showToast('🛒 Producto agregado')" style="background:var(--green-mid);border:none;border-radius:8px;color:white;font-size:.78rem;font-weight:600;padding:4px 10px;cursor:pointer;flex-shrink:0"><i class="bi bi-bag-plus"></i></button>
+            <button onclick="addToCart('${p.firestoreId}')" style="background:var(--green-mid);border:none;border-radius:8px;color:white;font-size:.78rem;font-weight:600;padding:4px 10px;cursor:pointer;flex-shrink:0"><i class="bi bi-bag-plus"></i></button>
           </div></div>`).join("")}
         </div>
       </div>`:`<div style="text-align:center;padding:1.5rem;background:var(--cream);border-radius:12px;color:var(--muted);font-size:.88rem;margin-bottom:1.5rem">Este agricultor aún no tiene productos publicados.</div>`}
@@ -4206,6 +4210,11 @@ function mostrarFormularioRegistro() {
     if (sec) { sec.style.display = 'block'; setTimeout(function(){ sec.scrollIntoView({behavior:'smooth'}); }, 50); }
   }
 }
+// Si el módulo aún no cargó y alguien pulsa "Agregar", mostrar login en vez de dejar pasar
+window.addToCart = window.addToCart || function() {
+  var modal = document.getElementById('loginModal');
+  if (modal && window.bootstrap) new bootstrap.Modal(modal).show();
+};
 </script>
 </body>
 </html>
