@@ -1979,23 +1979,19 @@ let currentFilter = "all";
 // ── Exponer funciones al ámbito global ──
 window._fb = { auth, db, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, where, serverTimestamp };
 
-// Siempre mantener window.currentUser sincronizado para que los guards funcionen
+// mantiene window.currentUser sincronizado con la variable local
 Object.defineProperty(window, 'currentUser', {
   get: () => currentUser,
   set: (v) => { currentUser = v; },
   configurable: true
 });
 
-// ══════════════════════════════════════
-//  ADMIN EMAILS — agregá acá los correos que deben ser admin
-// ══════════════════════════════════════
+// correos que tienen acceso de administrador
 const ADMIN_EMAILS = [
   "agripluscr@gmail.com"   // ← cambiá esto por tu correo actual
 ];
 
-// ══════════════════════════════════════
-//  AUTH STATE LISTENER
-// ══════════════════════════════════════
+// escucha cambios de sesión y actualiza la UI
 onAuthStateChanged(auth, async (user) => {
   // Si el usuario acaba de entrar con Google y aún no completó el modal de configuración,
   // ignorar este trigger hasta que confirme nombre y tipo.
@@ -2017,22 +2013,22 @@ onAuthStateChanged(auth, async (user) => {
       } catch(e) { currentUserData = null; }
     }
 
-    // Auto-promover a admin si el email está en la lista
-    if (ADMIN_EMAILS.includes(user.email?.toLowerCase()) && currentUserData?.tipo !== "admin") {
-      try {
-        await setDoc(doc(db, "usuarios", user.uid), {
-          uid: user.uid,
-          nombre: currentUserData?.nombre || user.displayName || user.email,
-          email: user.email,
-          telefono: currentUserData?.telefono || "",
-          tipo: "admin",
-          finca: currentUserData?.finca || "",
-          createdAt: currentUserData?.createdAt || serverTimestamp()
-        }, { merge: true });
-        if (!currentUserData) currentUserData = {};
-        currentUserData.tipo = "admin";
-        currentUserData.nombre = currentUserData.nombre || user.displayName || user.email;
-      } catch(e) {}
+    // si es admin, forzar el rol en memoria antes de renderizar (sin esperar Firestore)
+    if (ADMIN_EMAILS.includes(user.email?.toLowerCase())) {
+      if (!currentUserData) currentUserData = {};
+      currentUserData.tipo   = "admin";
+      currentUserData.uid    = user.uid;
+      currentUserData.email  = user.email;
+      currentUserData.nombre = currentUserData.nombre || user.displayName || user.email;
+      setDoc(doc(db, "usuarios", user.uid), {
+        uid: user.uid,
+        nombre: currentUserData.nombre,
+        email: user.email,
+        telefono: currentUserData.telefono || "",
+        tipo: "admin",
+        finca: currentUserData.finca || "",
+        createdAt: currentUserData.createdAt || serverTimestamp()
+      }, { merge: true }).catch(() => {});
     }
 
     const name = currentUserData?.nombre || user.email;
@@ -2104,9 +2100,7 @@ onAuthStateChanged(auth, async (user) => {
   loadAllProducts();
 });
 
-// ══════════════════════════════════════
-//  CARGAR PRODUCTOS DESDE FIRESTORE (tiempo real)
-// ══════════════════════════════════════
+// productos en tiempo real desde Firestore
 function loadAllProducts() {
   onSnapshot(collection(db, "productos"), (snap) => {
     allProducts = snap.docs.map(d => ({ firestoreId: d.id, ...d.data() }));
@@ -2130,9 +2124,7 @@ function loadAllProducts() {
   });
 }
 
-// ══════════════════════════════════════
-//  RENDER PRODUCTOS
-// ══════════════════════════════════════
+// dibuja las tarjetas de productos según el filtro activo
 function renderProducts() {
   const search = (document.getElementById("searchInput").value || "").toLowerCase();
   const grid = document.getElementById("productsGrid");
@@ -2188,9 +2180,7 @@ document.getElementById("categoryFilter").addEventListener("click", e => {
   renderProducts();
 });
 
-// ══════════════════════════════════════
-//  CARRITO
-// ══════════════════════════════════════
+// lógica del carrito de compras
 window.addToCart = function(firestoreId) {
   if (!currentUser) {
     showToast("🔒 Iniciá sesión para agregar productos al carrito");
@@ -2255,9 +2245,7 @@ function renderCart() {
   document.getElementById("cartTotalDisplay").textContent = "₡" + total.toLocaleString();
 }
 
-// ══════════════════════════════════════
-//  LOGIN / LOGOUT
-// ══════════════════════════════════════
+// login / logout
 window.toggleLoginModal = function() {
   if (currentUser) {
     openPerfilModal();
@@ -2267,9 +2255,7 @@ window.toggleLoginModal = function() {
 };
 window._toggleLoginModal = window.toggleLoginModal;
 
-// ══════════════════════════════════════
-//  MOSTRAR FORMULARIO DE REGISTRO
-// ══════════════════════════════════════
+// mostrar formulario de registro
 window.mostrarFormularioRegistro = function() {
   if (currentUser) return;
   const seccion = document.getElementById("registro");
@@ -2441,9 +2427,7 @@ window.openPerfilModal = async function() {
   }
 };
 
-// ══════════════════════════════════════
-//  FOTO DE PERFIL — CLOUDINARY + FIRESTORE
-// ══════════════════════════════════════
+// subida de foto de perfil a Cloudinary
 window.subirFotoPerfil = async function(input) {
   const file = input.files[0];
   if (!file) return;
@@ -2492,9 +2476,7 @@ window.subirFotoPerfil = async function(input) {
   }
 };
 
-// ══════════════════════════════════════
-//  GEOLOCALIZACIÓN (Nominatim / OpenStreetMap — sin Google Maps)
-// ══════════════════════════════════════
+// detecta la ubicación del usuario con OpenStreetMap
 window.detectarUbicacion = function() {
   const statusEl = document.getElementById("geoStatus");
   const btn = document.getElementById("btnGeo");
@@ -2552,15 +2534,18 @@ window.openTiendasModal = function() {
   new bootstrap.Modal(document.getElementById("tiendasModal")).show();
 };
 
+// inicio de sesión con email y contraseña
 window.doLogin = async function() {
   const email = document.getElementById("loginEmail").value.trim();
-  const pass = document.getElementById("loginPass").value;
+  const pass  = document.getElementById("loginPass").value;
   const errEl = document.getElementById("loginError");
   errEl.style.display = "none";
   if (!email || !pass) { errEl.textContent = "Completa todos los campos."; errEl.style.display = "block"; return; }
+  const isAdmin = ADMIN_EMAILS.includes(email.toLowerCase());
   try {
     await signInWithEmailAndPassword(auth, email, pass);
     bootstrap.Modal.getInstance(document.getElementById("loginModal")).hide();
+    if (isAdmin) setTimeout(() => window.location.reload(), 400);
   } catch(e) {
     errEl.textContent = "Correo o contraseña incorrectos.";
     errEl.style.display = "block";
@@ -2573,9 +2558,7 @@ window.doLogout = async function() {
   showToast("👋 Sesión cerrada");
 };
 
-// ══════════════════════════════════════
-//  MOSTRAR/OCULTAR CONTRASEÑA
-// ══════════════════════════════════════
+// toggle para mostrar/ocultar contraseña
 window.togglePassVis = function(inputId, btn) {
   const input = document.getElementById(inputId);
   const icon = btn.querySelector("i");
@@ -2588,9 +2571,7 @@ window.togglePassVis = function(inputId, btn) {
   }
 };
 
-// ══════════════════════════════════════
-//  LOGIN CON GOOGLE
-// ══════════════════════════════════════
+// login con cuenta de Google
 window.doGoogleLogin = async function() {
   const provider = new GoogleAuthProvider();
   try {
@@ -2744,9 +2725,7 @@ window.confirmGoogleAccountType = async function() {
   }
 };
 
-// ══════════════════════════════════════
-//  ELIMINAR CUENTA
-// ══════════════════════════════════════
+// eliminar cuenta del usuario
 window.confirmarEliminarCuenta = async function() {
   if (!currentUser) return;
   const confirmacion = confirm(
@@ -2773,9 +2752,7 @@ window.confirmarEliminarCuenta = async function() {
   }
 };
 
-// ══════════════════════════════════════
-//  REGISTRO DE CUENTA
-// ══════════════════════════════════════
+// registro de nueva cuenta
 window.doRegister = async function() {
   const nombre = document.getElementById("regNombre").value.trim();
   const telRaw = document.getElementById("regTelefono").value.replace(/\D/g, "").slice(0, 8);
@@ -2818,9 +2795,7 @@ window.doRegister = async function() {
   btnEl.disabled = false;
 };
 
-// ══════════════════════════════════════
-//  CLOUDINARY — SUBIDA DE IMÁGENES
-// ══════════════════════════════════════
+// subida de imágenes a Cloudinary
 const CLOUDINARY_CLOUD = "dljvu1fz0";
 const CLOUDINARY_PRESET = "agriplus_upload";
 
@@ -2878,9 +2853,7 @@ window.handleImageSelect = async function(input) {
   }
 };
 
-// ══════════════════════════════════════
-//  CONFIRMAR PEDIDO — pide ubicación primero
-// ══════════════════════════════════════
+// confirmar pedido: primero pide el método de pago y luego la ubicación
 window.confirmOrder = async function() {
   if (!cart.length) return;
   if (!currentUser) {
@@ -2928,9 +2901,7 @@ window.proceedAfterPayment = function() {
   openLocationPicker();
 };
 
-// ══════════════════════════════════════
-//  RECUPERAR CONTRASEÑA
-// ══════════════════════════════════════
+// recuperación de contraseña por correo
 window.showForgotPanel = function() {
   document.getElementById("loginMainPanel").style.display = "none";
   document.getElementById("forgotPanel").style.display = "block";
@@ -2981,9 +2952,7 @@ window.doForgotPassword = async function(e) {
   }
 };
 
-// ══════════════════════════════════════
-//  PANEL AGRICULTOR — CRUD PRODUCTOS
-// ══════════════════════════════════════
+// panel del agricultor: agregar, editar y eliminar productos
 window.openAdminIfLogged = function(e) {
   if(e) e.preventDefault();
   if (!currentUser) {
@@ -3141,9 +3110,7 @@ window.deleteProduct = async function(firestoreId) {
   }
 };
 
-// ══════════════════════════════════════
-//  TOAST
-// ══════════════════════════════════════
+// toast
 let toastTimer;
 window.showToast = function(msg) {
   const el = document.getElementById("toastEl");
@@ -3153,9 +3120,7 @@ window.showToast = function(msg) {
   toastTimer = setTimeout(() => el.style.display = "none", 3000);
 };
 
-// ══════════════════════════════════════
-//  NEWSLETTER — GUARDAR EN FIRESTORE
-// ══════════════════════════════════════
+// newsletter — guardar en firestore
 window.doNewsletter = async function(btn) {
   const input = btn.previousElementSibling;
   const email = input.value.trim();
@@ -3169,9 +3134,7 @@ window.doNewsletter = async function(btn) {
   }
 };
 
-// ══════════════════════════════════════
-//  MIS PEDIDOS (cliente)
-// ══════════════════════════════════════
+// pedidos realizados por el cliente
 const estadoColors = {
   pendiente: { bg: "var(--amber-light)", color: "#92400e", label: "⏳ Pendiente" },
   "en camino": { bg: "#e0f2fe", color: "#0c4a6e", label: "🚚 En camino" },
@@ -3222,9 +3185,7 @@ window.openMisPedidos = async function() {
   }
 };
 
-// ══════════════════════════════════════
-//  PEDIDOS RECIBIDOS (agricultor/admin)
-// ══════════════════════════════════════
+// pedidos recibidos visibles para el agricultor o admin
 window.openPedidosRecibidos = async function(e) {
   if (e) e.preventDefault();
   if (!currentUser) { showToast("🔒 Debés iniciar sesión"); new bootstrap.Modal(document.getElementById("loginModal")).show(); return; }
@@ -3304,9 +3265,7 @@ window.cambiarEstadoPedido = async function(pedidoId, nuevoEstado) {
   }
 };
 
-// ══════════════════════════════════════
-//  ESTADÍSTICAS
-// ══════════════════════════════════════
+// resumen de estadísticas del agricultor
 window.openEstadisticas = async function(e) {
   if (e) e.preventDefault();
   if (!currentUser) { showToast("🔒 Debés iniciar sesión"); return; }
@@ -3328,34 +3287,8 @@ window.openEstadisticas = async function(e) {
   }
 };
 
-// ══════════════════════════════════════
-//  CHAT EN TIEMPO REAL
-// ══════════════════════════════════════
-/*
-  ⚠️  REGLAS DE FIRESTORE REQUERIDAS — pegar en Firebase Console > Firestore > Reglas:
+// chat en tiempo real entre usuarios
 
-  rules_version = '2';
-  service cloud.firestore {
-    match /databases/{database}/documents {
-
-      match /conversaciones/{convId} {
-        allow read, write: if request.auth != null
-          && request.auth.uid in resource.data.participantes;
-        allow create: if request.auth != null
-          && request.auth.uid in request.resource.data.participantes;
-
-        match /mensajes/{msgId} {
-          allow read, write: if request.auth != null;
-        }
-      }
-
-      // Mantener las demás reglas existentes
-      match /{document=**} {
-        allow read, write: if request.auth != null;
-      }
-    }
-  }
-*/
 let chatActiveConvId = null;
 let chatUnsubscribeMessages = null;
 let chatUnsubscribeConvs = null;
@@ -3377,7 +3310,7 @@ function chatShowList() {
   document.getElementById("chatModalTitle").innerHTML = '<i class="bi bi-chat-dots-fill me-2" style="color:var(--green-mid)"></i>Mensajes';
 }
 
-// Abre el modal de chat en la lista
+// abre el modal de chat
 window.openChatModal = function() {
   if (!currentUser) { showToast("🔒 Debés iniciar sesión para ver mensajes"); new bootstrap.Modal(document.getElementById("loginModal")).show(); return; }
   const modal = new bootstrap.Modal(document.getElementById("chatModal"));
@@ -3386,7 +3319,7 @@ window.openChatModal = function() {
   chatLoadConvs();
 };
 
-// Inicia o abre conversación con un agricultor desde la card de producto
+// inicia o retoma una conversación con un agricultor
 window.iniciarChat = function(otherUid, otherName) {
   if (!currentUser) { showToast("🔒 Debés iniciar sesión para enviar mensajes"); new bootstrap.Modal(document.getElementById("loginModal")).show(); return; }
   if (otherUid === currentUser.uid) { showToast("💬 No podés chatear con vos mismo"); return; }
@@ -3397,7 +3330,7 @@ window.iniciarChat = function(otherUid, otherName) {
   setTimeout(() => chatOpenConv(otherUid, otherName, "Agricultor 🌾"), 300);
 };
 
-// Renderiza la lista de conversaciones
+// lista de conversaciones activas
 async function chatRenderConvs(convsList) {
   document.getElementById("chatListLoading").style.display = "none";
   chatConvsData = convsList.sort((a, b) => (b.updatedAt?.seconds || 0) - (a.updatedAt?.seconds || 0));
@@ -3443,7 +3376,7 @@ async function chatRenderConvs(convsList) {
   updateChatBadge(totalUnread);
 }
 
-// Carga lista de conversaciones — intenta onSnapshot, si falla usa getDocs
+// carga conversaciones en tiempo real, con fallback a getDocs
 function chatLoadConvs() {
   if (!currentUser) return;
   document.getElementById("chatListLoading").style.display = "block";
@@ -3503,7 +3436,7 @@ function updateChatBadge(count) {
   });
 }
 
-// Abre una conversación específica
+// abre el hilo de una conversación
 async function chatOpenConv(otherUid, otherName, otherRole) {
   if (!currentUser) return;
   chatActiveConvId = chatConvId(currentUser.uid, otherUid);
@@ -3673,9 +3606,7 @@ window._onChatUserLogout = function() {
 };
 
 
-// ══════════════════════════════════════
-//  SISTEMA DE ENTREGAS CON GPS
-// ══════════════════════════════════════
+// sistema de entregas con seguimiento GPS
 
 let _locationPickerMap = null;
 let _locationPickerMarker = null;
@@ -3978,9 +3909,7 @@ window.stopTrackingWatch = function() {
   if (window._trackingUnsub) { window._trackingUnsub(); window._trackingUnsub = null; }
 };
 
-// ══════════════════════════════════════
-//  ⭐ SISTEMA DE CALIFICACIONES
-// ══════════════════════════════════════
+// calificaciones de agricultores
 let _selectedRating = 0;
 const starLabels = ["","Muy malo","Regular","Bueno","Muy bueno","Excelente"];
 
@@ -4073,9 +4002,7 @@ window.openMisCalificaciones = async function() {
   } catch(e) { body.innerHTML=`<p class="text-danger p-3">Error al cargar calificaciones.</p>`; }
 };
 
-// ══════════════════════════════════════
-//  📊 DASHBOARD DE ESTADÍSTICAS REALES
-// ══════════════════════════════════════
+// dashboard con estadísticas reales de Firestore
 window.openDashboardModal = async function() {
   if (!currentUser) { showToast("🔒 Iniciá sesión"); return; }
   const role = currentUserData?.tipo;
@@ -4161,9 +4088,7 @@ window.openDashboardModal = async function() {
   } catch(e) { body.innerHTML=`<p class="text-danger p-3">Error al cargar estadísticas.</p>`; }
 };
 
-// ══════════════════════════════════════
-//  🌱 PERFIL PÚBLICO DEL AGRICULTOR
-// ══════════════════════════════════════
+// perfil público del agricultor
 window.openPublicFarmerProfile = async function(farmUid) {
   const modal = new bootstrap.Modal(document.getElementById("publicFarmerModal"));
   modal.show();
