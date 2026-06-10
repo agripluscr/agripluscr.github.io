@@ -972,11 +972,18 @@ footer a:hover { color: var(--green-light); }
                 </div>
                 <div class="col-md-6">
                   <label class="form-label">Tipo de cuenta</label>
-                  <select class="form-select" id="regTipo">
+                  <select class="form-select" id="regTipo" onchange="toggleFincaField()">
                     <option value="cliente">Cliente</option>
                     <option value="agricultor">Agricultor</option>
                     <option value="empresa">Empresa</option>
                   </select>
+                </div>
+                <div class="col-12" id="fincaField" style="display:none">
+                  <label class="form-label" id="fincaFieldLabel">Nombre de tu finca <span style="color:var(--muted);font-weight:400;font-size:.82rem">(opcional)</span></label>
+                  <div class="input-group">
+                    <span class="input-group-text" id="fincaFieldIcon" style="background:var(--green-pale);border-color:var(--border);color:var(--green-mid)"><i class="bi bi-tree-fill"></i></span>
+                    <input type="text" class="form-control" id="regFinca" placeholder="Ej: Finca La Esperanza, Alajuela">
+                  </div>
                 </div>
                 <div class="col-12">
                   <div id="registerError" class="text-danger" style="font-size:.82rem;display:none;margin-bottom:.5rem">
@@ -1163,6 +1170,12 @@ footer a:hover { color: var(--green-light); }
             </div>
             <i class="bi bi-check-circle-fill ms-auto" id="gCheck_empresa" style="color:var(--green-mid);font-size:1.2rem;display:none"></i>
           </button>
+        </div>
+
+        <!-- Campo finca (solo agricultor) -->
+        <div id="gFincaField" style="display:none;margin-bottom:1rem">
+          <label class="form-label" id="gFincaLabel" style="font-weight:600;font-size:.88rem"><i class="bi bi-tree-fill me-1" style="color:var(--green-mid)"></i>Nombre de tu finca <span style="color:var(--muted);font-weight:400">(opcional)</span></label>
+          <input type="text" class="form-control" id="gFincaInput" placeholder="Ej: Finca La Esperanza, Alajuela" style="border-radius:12px">
         </div>
 
         <!-- Botón confirmar -->
@@ -1474,7 +1487,19 @@ footer a:hover { color: var(--green-light); }
           </div>
           <input type="file" id="perfilFotoInput" accept="image/*" style="display:none" onchange="subirFotoPerfil(this)">
           <div style="flex:1">
-            <div style="font-weight:700;font-size:1.1rem;margin-bottom:2px" id="perfilNombre">—</div>
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">
+              <div style="font-weight:700;font-size:1.1rem" id="perfilNombre">—</div>
+              <button onclick="editarNombrePerfil()" title="Editar nombre" style="background:none;border:none;padding:2px 5px;cursor:pointer;color:var(--muted);font-size:.85rem;border-radius:6px;transition:all .2s" onmouseover="this.style.background='var(--green-pale)';this.style.color='var(--green-mid)'" onmouseout="this.style.background='none';this.style.color='var(--muted)'">
+                <i class="bi bi-pencil-fill"></i>
+              </button>
+            </div>
+            <div id="perfilNombreEdit" style="display:none;margin-bottom:6px">
+              <div style="display:flex;gap:6px;align-items:center">
+                <input type="text" id="perfilNombreInput" style="border:1.5px solid var(--green-mid);border-radius:8px;padding:.3rem .6rem;font-size:.9rem;flex:1;outline:none">
+                <button onclick="guardarNombrePerfil()" style="background:var(--green-mid);color:white;border:none;border-radius:8px;padding:.3rem .7rem;cursor:pointer;font-size:.82rem;font-weight:600">Guardar</button>
+                <button onclick="cancelarEditarNombre()" style="background:none;border:1.5px solid var(--border);border-radius:8px;padding:.3rem .7rem;cursor:pointer;font-size:.82rem;color:var(--muted)">✕</button>
+              </div>
+            </div>
             <div style="font-size:.82rem;color:var(--muted);margin-bottom:4px" id="perfilEmail">—</div>
             <div style="font-size:.73rem;color:var(--green-mid);min-height:1rem" id="perfilFotoStatus"></div>
             <span class="profile-badge-chip mt-1" id="perfilRolChip"><i class="bi bi-person-fill me-1"></i><span id="perfilRolLabel">Cliente</span></span>
@@ -1501,6 +1526,20 @@ footer a:hover { color: var(--green-light); }
           <div class="d-flex align-items-center gap-2 mb-2">
             <i class="bi bi-telephone-fill" style="color:var(--green-mid)"></i>
             <span id="perfilTelefono" style="color:var(--muted)">Sin teléfono registrado</span>
+          </div>
+          <div id="perfilFincaRow" style="display:none" class="d-flex align-items-center gap-2 mb-2">
+            <i id="perfilFincaIcon" class="bi bi-tree-fill" style="color:var(--green-mid)"></i>
+            <span id="perfilFinca" style="color:var(--muted)">Sin finca registrada</span>
+            <button onclick="editarFincaPerfil()" id="perfilFincaEditBtn" title="Editar" style="background:none;border:none;padding:1px 5px;cursor:pointer;color:var(--muted);font-size:.78rem;border-radius:6px;margin-left:auto;transition:all .2s" onmouseover="this.style.background='var(--green-pale)';this.style.color='var(--green-mid)'" onmouseout="this.style.background='none';this.style.color='var(--muted)'">
+              <i class="bi bi-pencil-fill"></i>
+            </button>
+          </div>
+          <div id="perfilFincaEdit" style="display:none;margin-bottom:.5rem">
+            <div style="display:flex;gap:6px;align-items:center">
+              <input type="text" id="perfilFincaInput" placeholder="Nombre de tu finca" style="border:1.5px solid var(--green-mid);border-radius:8px;padding:.3rem .6rem;font-size:.85rem;flex:1;outline:none">
+              <button onclick="guardarFincaPerfil()" style="background:var(--green-mid);color:white;border:none;border-radius:8px;padding:.3rem .7rem;cursor:pointer;font-size:.82rem;font-weight:600">Guardar</button>
+              <button onclick="cancelarEditarFinca()" style="background:none;border:1.5px solid var(--border);border-radius:8px;padding:.3rem .7rem;cursor:pointer;font-size:.82rem;color:var(--muted)">✕</button>
+            </div>
           </div>
           <div class="d-flex align-items-center gap-2">
             <i class="bi bi-shield-check-fill" style="color:var(--green-mid)"></i>
@@ -1810,16 +1849,19 @@ onAuthStateChanged(auth, async (user) => {
 
   currentUser = user;
   if (user) {
-    // Cargar datos del perfil desde Firestore por UID directo
-    try {
-      const snap = await getDoc(doc(db, "usuarios", user.uid));
-      if (snap.exists()) currentUserData = snap.data();
-      else {
-        // fallback: buscar por campo uid (registros antiguos con addDoc)
-        const q = await getDocs(query(collection(db, "usuarios"), where("uid", "==", user.uid)));
-        if (!q.empty) currentUserData = q.docs[0].data();
-      }
-    } catch(e) { currentUserData = null; }
+    // Si currentUserData ya está seteado con nombre correcto (ej: recién confirmó Google modal),
+    // no sobreescribir con datos de Firestore que podrían estar desactualizados en caché
+    const alreadyHasData = currentUserData?.uid === user.uid && currentUserData?.nombre && currentUserData.nombre !== user.email;
+    if (!alreadyHasData) {
+      try {
+        const snap = await getDoc(doc(db, "usuarios", user.uid));
+        if (snap.exists()) currentUserData = snap.data();
+        else {
+          const q = await getDocs(query(collection(db, "usuarios"), where("uid", "==", user.uid)));
+          if (!q.empty) currentUserData = q.docs[0].data();
+        }
+      } catch(e) { currentUserData = null; }
+    }
 
     const name = currentUserData?.nombre || user.email;
     const role = currentUserData?.tipo || "cliente";
@@ -2043,8 +2085,80 @@ window.mostrarFormularioRegistro = function() {
 };
 window._mostrarFormularioRegistro = window.mostrarFormularioRegistro;
 
+window.toggleFincaField = function() {
+  const tipo = document.getElementById("regTipo").value;
+  const field = document.getElementById("fincaField");
+  const label = document.getElementById("fincaFieldLabel");
+  const icon  = document.getElementById("fincaFieldIcon").querySelector("i");
+  const input = document.getElementById("regFinca");
+  if (tipo === "agricultor") {
+    field.style.display = "block";
+    label.innerHTML = 'Nombre de tu finca <span style="color:var(--muted);font-weight:400;font-size:.82rem">(opcional)</span>';
+    icon.className = "bi bi-tree-fill";
+    input.placeholder = "Ej: Finca La Esperanza, Alajuela";
+  } else if (tipo === "empresa") {
+    field.style.display = "block";
+    label.innerHTML = 'Nombre de tu empresa <span style="color:var(--muted);font-weight:400;font-size:.82rem">(opcional)</span>';
+    icon.className = "bi bi-building";
+    input.placeholder = "Ej: AgroTico S.A.";
+  } else {
+    field.style.display = "none";
+    input.value = "";
+  }
+};
+
+window.editarFincaPerfil = function() {
+  document.getElementById("perfilFincaInput").value = currentUserData?.finca || "";
+  document.getElementById("perfilFincaEdit").style.display = "block";
+  document.getElementById("perfilFincaInput").focus();
+};
+window.cancelarEditarFinca = function() {
+  document.getElementById("perfilFincaEdit").style.display = "none";
+};
+window.guardarFincaPerfil = async function() {
+  const nuevaFinca = document.getElementById("perfilFincaInput").value.trim();
+  const tipo = currentUserData?.tipo;
+  const esEmpresa = tipo === "empresa";
+  try {
+    const { doc, updateDoc } = window._fb;
+    const db = window._fb.db;
+    await updateDoc(doc(db, "usuarios", currentUser.uid), { finca: nuevaFinca });
+    currentUserData.finca = nuevaFinca;
+    document.getElementById("perfilFinca").textContent = nuevaFinca || (esEmpresa ? "Sin empresa registrada" : "Sin finca registrada");
+    document.getElementById("perfilFincaEdit").style.display = "none";
+    showToast(esEmpresa ? "✅ Empresa actualizada" : "✅ Finca actualizada");
+  } catch(e) {
+    showToast(esEmpresa ? "❌ Error al guardar la empresa" : "❌ Error al guardar la finca");
+  }
+};
+window.editarNombrePerfil = function() {
+  const input = document.getElementById("perfilNombreInput");
+  input.value = document.getElementById("perfilNombre").textContent;
+  document.getElementById("perfilNombreEdit").style.display = "block";
+  input.focus();
+};
+window.cancelarEditarNombre = function() {
+  document.getElementById("perfilNombreEdit").style.display = "none";
+};
+window.guardarNombrePerfil = async function() {
+  const nuevoNombre = document.getElementById("perfilNombreInput").value.trim();
+  if (!nuevoNombre) return;
+  try {
+    const { doc, updateDoc } = window._fb;
+    const db = window._fb.db;
+    await updateDoc(doc(db, "usuarios", currentUser.uid), { nombre: nuevoNombre });
+    currentUserData.nombre = nuevoNombre;
+    document.getElementById("perfilNombre").textContent = nuevoNombre;
+    document.getElementById("perfilNombreEdit").style.display = "none";
+    document.getElementById("perfilBarNombre").textContent = nuevoNombre;
+    document.getElementById("loginBtnText").textContent = nuevoNombre.split(" ")[0] + " ▾";
+    document.getElementById("perfilBarAvatar").textContent = nuevoNombre.charAt(0).toUpperCase();
+    showToast("✅ Nombre actualizado");
+  } catch(e) {
+    showToast("❌ Error al guardar el nombre");
+  }
+};
 window.openPerfilModal = async function() {
-  if (!currentUser) return;
   const modal = new bootstrap.Modal(document.getElementById("perfilModal"));
   modal.show();
   // Nombre y email
@@ -2054,6 +2168,26 @@ window.openPerfilModal = async function() {
   document.getElementById("perfilEmail").textContent = currentUser.email;
   document.getElementById("perfilTelefono").textContent = currentUserData?.telefono || "Sin teléfono registrado";
   document.getElementById("perfilFotoStatus").textContent = "";
+  // Finca/Empresa (agricultores y empresas)
+  const fincaRow = document.getElementById("perfilFincaRow");
+  const fincaIcon = document.getElementById("perfilFincaIcon");
+  const fincaSpan = document.getElementById("perfilFinca");
+  const fincaInput = document.getElementById("perfilFincaInput");
+  if (tipo === "agricultor" || tipo === "admin") {
+    fincaRow.style.display = "flex";
+    fincaIcon.className = "bi bi-tree-fill";
+    fincaSpan.textContent = currentUserData?.finca || "Sin finca registrada";
+    fincaInput.placeholder = "Nombre de tu finca";
+    document.getElementById("perfilFincaEdit").style.display = "none";
+  } else if (tipo === "empresa") {
+    fincaRow.style.display = "flex";
+    fincaIcon.className = "bi bi-building";
+    fincaSpan.textContent = currentUserData?.finca || "Sin empresa registrada";
+    fincaInput.placeholder = "Nombre de tu empresa";
+    document.getElementById("perfilFincaEdit").style.display = "none";
+  } else {
+    fincaRow.style.display = "none";
+  }
   // Avatar: foto guardada o inicial
   const avatarEl = document.getElementById("perfilAvatar");
   if (currentUserData?.fotoUrl) {
@@ -2302,6 +2436,22 @@ window.selectGoogleAccountType = function(tipo) {
   const confirmBtn = document.getElementById("confirmGoogleTypeBtn");
   confirmBtn.disabled = false;
   confirmBtn.style.opacity = "1";
+  // Mostrar campo finca/empresa para agricultor y empresa, con texto dinámico
+  const gFincaField = document.getElementById("gFincaField");
+  const gFincaLabel = document.getElementById("gFincaLabel");
+  const gFincaInput = document.getElementById("gFincaInput");
+  if (tipo === "agricultor") {
+    gFincaField.style.display = "block";
+    gFincaLabel.innerHTML = '<i class="bi bi-tree-fill me-1" style="color:var(--green-mid)"></i>Nombre de tu finca <span style="color:var(--muted);font-weight:400">(opcional)</span>';
+    gFincaInput.placeholder = "Ej: Finca La Esperanza, Alajuela";
+  } else if (tipo === "empresa") {
+    gFincaField.style.display = "block";
+    gFincaLabel.innerHTML = '<i class="bi bi-building me-1" style="color:var(--green-mid)"></i>Nombre de tu empresa <span style="color:var(--muted);font-weight:400">(opcional)</span>';
+    gFincaInput.placeholder = "Ej: AgroTico S.A.";
+  } else {
+    gFincaField.style.display = "none";
+    gFincaInput.value = "";
+  }
 };
 
 window.confirmGoogleAccountType = async function() {
@@ -2322,22 +2472,25 @@ window.confirmGoogleAccountType = async function() {
 
   try {
     const userRef = doc(db, "usuarios", user.uid);
+    const finca = (tipo === "agricultor" || tipo === "empresa") ? (document.getElementById("gFincaInput").value.trim()) : "";
     await setDoc(userRef, {
       uid: user.uid,
       nombre: nombre,
       email: user.email,
       telefono: "",
       tipo: tipo,
+      finca: finca,
       createdAt: serverTimestamp()
     });
     bootstrap.Modal.getInstance(document.getElementById("googleAccountTypeModal"))?.hide();
     window._pendingGoogleUser = null;
     window._selectedGoogleType = null;
-    // Desactivar bandera y re-disparar el flujo de sesión manualmente con los datos recién guardados
-    window._awaitingGoogleSetup = false;
-    currentUserData = { uid: user.uid, nombre, email: user.email, telefono: "", tipo };
+
+    // Actualizar currentUserData con los datos ingresados
+    currentUserData = { uid: user.uid, nombre, email: user.email, telefono: "", tipo, finca };
     currentUser = user;
-    // Actualizar UI igual que onAuthStateChanged
+
+    // Actualizar UI
     const rolNames2 = { cliente: "Cliente", agricultor: "Agricultor 🌾", empresa: "Empresa", admin: "Admin 🛡️" };
     document.getElementById("loginBtnText").textContent = nombre.split(" ")[0] + " ▾";
     document.getElementById("loginToggleBtn").classList.add("logged");
@@ -2360,6 +2513,10 @@ window.confirmGoogleAccountType = async function() {
     }
     const rolNames = { cliente: "Cliente 🛒", agricultor: "Agricultor 🌾", empresa: "Empresa 🏢" };
     showToast(`✅ ¡Bienvenido, ${nombre.split(" ")[0]}! Cuenta creada como ${rolNames[tipo]}`);
+
+    // Desactivar bandera al final para que futuros triggers de onAuthStateChanged
+    // (ej: recargar página) ya lean los datos correctos de Firestore
+    window._awaitingGoogleSetup = false;
   } catch(e) {
     showToast("❌ Error al guardar el tipo de cuenta. Intentá de nuevo.");
     confirmBtn.disabled = false;
@@ -2414,13 +2571,14 @@ window.doRegister = async function() {
   if (!terms) { errEl.textContent = "Debes aceptar los términos y condiciones."; errEl.style.display = "block"; return; }
   if (pass.length < 6) { errEl.textContent = "La contraseña debe tener al menos 6 caracteres."; errEl.style.display = "block"; return; }
 
+  const finca = (tipo === "agricultor" || tipo === "empresa") ? (document.getElementById("regFinca").value.trim()) : "";
   btnEl.textContent = "Creando cuenta...";
   btnEl.disabled = true;
   try {
     const cred = await createUserWithEmailAndPassword(auth, email, pass);
     await setDoc(doc(db, "usuarios", cred.user.uid), {
       uid: cred.user.uid,
-      nombre, telefono, email, tipo,
+      nombre, telefono, email, tipo, finca,
       createdAt: serverTimestamp()
     });
     await sendEmailVerification(cred.user);
