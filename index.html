@@ -2018,21 +2018,33 @@ onAuthStateChanged(auth, async (user) => {
     }
 
     // Auto-promover a admin si el email está en la lista
-    if (ADMIN_EMAILS.includes(user.email?.toLowerCase()) && currentUserData?.tipo !== "admin") {
-      try {
-        await setDoc(doc(db, "usuarios", user.uid), {
-          uid: user.uid,
-          nombre: currentUserData?.nombre || user.displayName || user.email,
-          email: user.email,
-          telefono: currentUserData?.telefono || "",
-          tipo: "admin",
-          finca: currentUserData?.finca || "",
-          createdAt: currentUserData?.createdAt || serverTimestamp()
-        }, { merge: true });
-        if (!currentUserData) currentUserData = {};
-        currentUserData.tipo = "admin";
-        currentUserData.nombre = currentUserData.nombre || user.displayName || user.email;
-      } catch(e) {}
+    // IMPORTANTE: hacer el setDoc primero y LUEGO actualizar currentUserData antes de leer el role
+    if (ADMIN_EMAILS.includes(user.email?.toLowerCase())) {
+      if (currentUserData?.tipo !== "admin") {
+        try {
+          const adminData = {
+            uid: user.uid,
+            nombre: currentUserData?.nombre || user.displayName || user.email,
+            email: user.email,
+            telefono: currentUserData?.telefono || "",
+            tipo: "admin",
+            finca: currentUserData?.finca || "",
+            createdAt: currentUserData?.createdAt || serverTimestamp()
+          };
+          await setDoc(doc(db, "usuarios", user.uid), adminData, { merge: true });
+          // Actualizar currentUserData INMEDIATAMENTE tras guardar en Firestore
+          currentUserData = { ...(currentUserData || {}), ...adminData };
+        } catch(e) {
+          // Si falla Firestore, forzar el rol en memoria de todas formas
+          if (!currentUserData) currentUserData = {};
+          currentUserData.tipo = "admin";
+          currentUserData.nombre = currentUserData.nombre || user.displayName || user.email;
+          currentUserData.email = user.email;
+        }
+      }
+      // Garantizar rol admin en memoria aunque Firestore ya lo tuviera
+      if (!currentUserData) currentUserData = {};
+      currentUserData.tipo = "admin";
     }
 
     const name = currentUserData?.nombre || user.email;
@@ -2558,12 +2570,22 @@ window.doLogin = async function() {
   const errEl = document.getElementById("loginError");
   errEl.style.display = "none";
   if (!email || !pass) { errEl.textContent = "Completa todos los campos."; errEl.style.display = "block"; return; }
+
+  // Botón con spinner
+  const btn = document.querySelector("#loginMainPanel .btn-register");
+  const origText = btn ? btn.textContent : "Entrar";
+  if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" style="width:14px;height:14px"></span>Entrando...'; }
+
   try {
     await signInWithEmailAndPassword(auth, email, pass);
-    bootstrap.Modal.getInstance(document.getElementById("loginModal")).hide();
+    // Cerrar modal DESPUÉS de que Firebase confirma la sesión
+    const modalEl = document.getElementById("loginModal");
+    const modalInst = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+    modalInst.hide();
   } catch(e) {
     errEl.textContent = "Correo o contraseña incorrectos.";
     errEl.style.display = "block";
+    if (btn) { btn.disabled = false; btn.textContent = origText; }
   }
 };
 
